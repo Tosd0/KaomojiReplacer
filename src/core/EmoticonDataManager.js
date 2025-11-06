@@ -1,6 +1,6 @@
 /**
  * EmoticonDataManager.js
- * 颜文字数据管理类 - 提供完整的 CRUD 功能
+ * 颜文字数据管理类 - 完整 CRUD
  */
 
 class EmoticonDataManager {
@@ -164,10 +164,7 @@ class EmoticonDataManager {
         return {
             totalEmoticons: this.emoticons.length,
             totalKeywords: this.getAllKeywords().length,
-            totalCategories: this.getAllCategories().length,
-            averageKeywordsPerEmoticon: this.emoticons.length > 0
-                ? (this.emoticons.reduce((sum, e) => sum + e.keywords.length, 0) / this.emoticons.length).toFixed(2)
-                : 0
+            totalCategories: this.getAllCategories().length
         };
     }
 

@@ -31,7 +31,7 @@
   },
   {
     "emoticon": "( ・ω・)",
-    "keywords": ["疑惑", "不解", "好奇", "思考"],
+    "keywords": ["疑惑", "好奇", "卖萌"],
     "weight": 1.0,
     "category": ""
   },
@@ -55,7 +55,7 @@
   },
   {
     "emoticon": "φ(゜▽゜*)♪",
-    "keywords": ["记笔记", "记录", "写字"],
+    "keywords": ["开心", "写字"],
     "weight": 1.0,
     "category": ""
   }

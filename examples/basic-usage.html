@@ -109,9 +109,9 @@
         </div>
 
         <div>
-            <button onclick="processText()">🔄 执行替换</button>
-            <button onclick="previewText()">👁️ 预览匹配</button>
-            <button onclick="clearOutput()">🗑️ 清空</button>
+            <button onclick="processText()">替换</button>
+            <button onclick="previewText()">预览</button>
+            <button onclick="clearOutput()">清空</button>
         </div>
 
         <div class="output-area">
@@ -164,9 +164,7 @@
                 const stats = manager.getStats();
                 document.getElementById('statsInfo').textContent =
                     `已加载 ${stats.totalEmoticons} 个颜文字\n` +
-                    `总关键词数量: ${stats.totalKeywords}\n` +
-                    `平均关键词数量: ${stats.averageKeywordsPerEmoticon}`;
-
+                    `总关键词数量: ${stats.totalKeywords}\n`
             } catch (error) {
                 console.error('Initialization failed:', error);
                 alert('初始化失败: ' + error.message);
@@ -298,7 +296,7 @@
 
         function loadExample3() {
             document.getElementById('inputText').value =
-                '看到他的回复，我只想说[emoticon:鄙视,不屑]。算了，还是去[emoticon:记笔记,记录]吧，不然又要[emoticon:难过,伤心]了。';
+                '看到他的回复，我只感觉[emoticon:鄙视,不屑]。但还是有点[emoticon:难过,伤心]。';
         }
 
         // 页面加载时初始化

@@ -1,11 +1,6 @@
 /**
  * sillytavern.js
  * SillyTavern 集成层
- *
- * 使用说明：
- * 1. 将此文件放置在 SillyTavern/public/scripts/extensions/emoticon-replacer/ 目录下
- * 2. 同时复制 src/core/ 目录到同一位置
- * 3. 在 SillyTavern 中启用扩展
  */
 
 // SillyTavern Extension 主类

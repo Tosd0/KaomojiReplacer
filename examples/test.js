@@ -400,7 +400,6 @@ suite.test('EmoticonDataManager query functions', () => {
 
     log(`  Total keywords: ${stats.totalKeywords}`);
     log(`  Total categories: ${stats.totalCategories}`);
-    log(`  Avg keywords per emoticon: ${stats.averageKeywordsPerEmoticon}`);
 });
 
 // 测试 16: EmoticonDataManager 导出功能
