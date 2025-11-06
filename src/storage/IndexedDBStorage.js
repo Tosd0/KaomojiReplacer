@@ -219,7 +219,7 @@ async function getStorageStats() {
         return {
             hasData: data !== null,
             count: data ? data.length : 0,
-            sizeKB: data ? (JSON.stringify(data).length / 1024).toFixed(2) : 0
+            sizeKB: data ? (JSON.stringify(data).length / 1024).toFixed(2) : '0.00'
         };
     } catch (error) {
         return {
