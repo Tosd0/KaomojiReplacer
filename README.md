@@ -12,6 +12,18 @@
 
 ## 快速开始
 
+### 安装
+
+```bash
+npm install emoticon-replacer
+```
+
+或直接克隆仓库使用：
+
+```bash
+git clone https://github.com/Tosd0/EmoticonReplacer.git
+```
+
 ### 数据格式
 
 在 `data/emoticons.template.json` 中定义颜文字映射：
@@ -27,9 +39,42 @@
 ]
 ```
 
-### 基础使用
+### 三种使用方式
+
+#### 方式 1: 快捷 API（推荐，最简单）
 
 ```javascript
+const { quickReplace, loadFromFile } = require('emoticon-replacer');
+
+// 从文件加载数据
+const emoticons = await loadFromFile('./data/emoticons.template.json');
+
+// 一行代码完成替换
+const result = quickReplace('今天真是[emoticon:无语,黑脸]', emoticons);
+console.log(result.text); // 输出: 今天真是 = =
+```
+
+#### 方式 2: 工厂函数（推荐，灵活配置）
+
+```javascript
+const { createReplacer, loadFromFile } = require('emoticon-replacer');
+
+// 加载数据
+const emoticons = await loadFromFile('./data/emoticons.template.json');
+
+// 创建替换器实例（自动配置好所有组件）
+const replacer = createReplacer({ emoticons });
+
+// 使用替换器
+const result = replacer.replaceText('今天真是[emoticon:无语,黑脸]');
+console.log(result.text);
+```
+
+#### 方式 3: 直接使用类（最灵活）
+
+```javascript
+const { EmoticonReplacer, SearchEngine, EmoticonDataManager } = require('emoticon-replacer');
+
 // 1. 创建数据管理器并加载数据
 const manager = new EmoticonDataManager();
 const response = await fetch('data/emoticons.template.json');
@@ -51,6 +96,35 @@ manager.addKeyword('= =', '不爽');           // 添加关键词
 manager.setCategory('= =', '表情');          // 设置分类
 const filtered = manager.filterByCategory('表情'); // 按分类筛选
 ```
+
+#### 方式 4: IndexedDB 存储（推荐，前端项目）
+
+适合前端项目，自动管理数据持久化：
+
+```javascript
+const { initEmoticonStorage, quickReplace } = require('emoticon-replacer');
+
+// 初始化存储（首次自动从远程加载，之后使用缓存）
+const emoticons = await initEmoticonStorage({
+  defaultURL: 'https://your-cdn.com/emoticons.json'  // 可选
+});
+
+// 直接使用
+const result = quickReplace('今天[emoticon:开心]', emoticons);
+
+// 后续调用直接从 IndexedDB 读取（更快、离线可用）
+const cachedEmoticons = await initEmoticonStorage();
+```
+
+**特性：**
+- ✅ 首次自动从远程加载
+- ✅ 之后从 IndexedDB 读取（离线可用）
+- ✅ 用户可自定义数据
+- ✅ 降级优雅（远程失败返回空数组）
+
+### TypeScript 支持
+
+本库提供完整的 TypeScript 类型定义，支持类型检查和智能提示。
 
 ### 标记格式
 
@@ -85,25 +159,113 @@ const filtered = manager.filterByCategory('表情'); // 按分类筛选
 
 ```
 EmoticonReplacer/
-├── src/
-│   ├── core/                         # 核心模块（可独立使用）
-│   │   ├── SearchEngine.js           # BM25 搜索引擎
-│   │   ├── EmoticonReplacer.js       # 替换引擎
-│   │   └── EmoticonDataManager.js    # 数据管理器（CRUD）
-│   └── integrations/                 # 集成层
-│       └── sillytavern.js            # SillyTavern 集成
+├── src/core/                    # 核心模块
+│   ├── SearchEngine.js          # BM25 搜索引擎
+│   ├── EmoticonReplacer.js      # 替换引擎
+│   └── EmoticonDataManager.js   # 数据管理器
+├── src/integrations/
+│   └── sillytavern.js           # SillyTavern 集成
 ├── data/
-│   └── emoticons.template.json       # 数据模板
-└── examples/
-    ├── basic-usage.html              # 使用示例
-    └── test.js                       # 测试脚本
+│   └── emoticons.template.json  # 数据模板
+└── examples/                    # 使用示例
 ```
 
 ## API 参考
 
-### EmoticonReplacer
+### 快捷 API
+
+#### `quickReplace(text, emoticons, options)`
+
+一行代码完成文本替换：
 
 ```javascript
+const { quickReplace } = require('emoticon-replacer');
+
+const result = quickReplace(
+  '今天[emoticon:开心,高兴]',
+  emoticons,
+  {
+    strategy: 'best',
+    keepOriginalOnNotFound: true
+  }
+);
+
+console.log(result.text);
+console.log(result.successCount);
+```
+
+#### `quickQuery(keywords, emoticons, topK)`
+
+快速查询关键词对应的颜文字：
+
+```javascript
+const { quickQuery } = require('emoticon-replacer');
+
+const results = quickQuery('开心', emoticons, 5);
+console.log(results[0].emoticon);
+```
+
+#### `batchReplace(texts, emoticons, options)`
+
+批量处理多个文本：
+
+```javascript
+const { batchReplace } = require('emoticon-replacer');
+
+const texts = [
+  '第一条[emoticon:开心]消息',
+  '第二条[emoticon:无语]消息'
+];
+
+const results = batchReplace(texts, emoticons);
+results.forEach(r => console.log(r.text));
+```
+
+### 工厂函数
+
+#### `createReplacer(options)`
+
+创建完整配置的替换器：
+
+```javascript
+const { createReplacer } = require('emoticon-replacer');
+
+const replacer = createReplacer({
+  emoticons: [...],           // 数据数组
+  searchConfig: {             // BM25 参数
+    k1: 1.5,
+    b: 0.75
+  },
+  replaceConfig: {            // 替换配置
+    replaceStrategy: 'best'
+  }
+});
+```
+
+#### `createManager(data)`
+
+创建数据管理器：
+
+```javascript
+const { createManager } = require('emoticon-replacer');
+
+// 从数组创建
+const manager = createManager([...]);
+
+// 从 JSON 字符串创建
+const manager2 = createManager(jsonString);
+```
+
+### 核心类 API
+
+#### EmoticonReplacer
+
+```javascript
+const { EmoticonReplacer, SearchEngine } = require('emoticon-replacer');
+
+const engine = new SearchEngine();
+const replacer = new EmoticonReplacer(engine);
+
 // 替换文本
 replacer.replaceText(text, {
   strategy: 'best',              // 'first' | 'best' | 'all'
@@ -119,9 +281,17 @@ replacer.query('开心', 5);
 replacer.exactQuery('开心');
 ```
 
-### SearchEngine
+#### SearchEngine
 
 ```javascript
+const { SearchEngine } = require('emoticon-replacer');
+
+// 创建搜索引擎
+const engine = new SearchEngine({
+  k1: 1.5,  // 词频饱和参数
+  b: 0.75   // 长度归一化参数
+});
+
 // 构建索引
 engine.buildIndex(emoticons);
 
@@ -132,9 +302,11 @@ engine.search('文本', topK, threshold);
 engine.exactMatch('文本');
 ```
 
-### EmoticonDataManager
+#### EmoticonDataManager
 
 ```javascript
+const { EmoticonDataManager } = require('emoticon-replacer');
+
 // 数据加载
 const manager = new EmoticonDataManager();
 manager.loadFromJSON(jsonString);
@@ -167,6 +339,58 @@ manager.removeEmoticon('= =');               // 删除颜文字
 const json = manager.exportToJSON();         // 导出为 JSON
 const array = manager.exportToArray();       // 导出为数组
 ```
+
+### 数据加载与工具
+
+```javascript
+// Node.js 环境：从文件加载
+const emoticons = await loadFromFile('./data/emoticons.json');
+
+// 浏览器环境：从 URL 加载
+const emoticons = await loadFromURL('/data/emoticons.json');
+
+// 验证数据格式
+const result = validateData(data);
+```
+
+### IndexedDB 存储 API
+
+前端项目推荐使用 IndexedDB 存储：
+
+```javascript
+const {
+  initEmoticonStorage,
+  getEmoticons,
+  saveEmoticons,
+  clearEmoticons,
+  getStorageStats
+} = require('emoticon-replacer');
+
+// 初始化存储（自动管理加载和缓存）
+const emoticons = await initEmoticonStorage({
+  defaultURL: 'https://cdn.example.com/emoticons.json',  // 可选
+  forceReload: false  // 可选：是否强制重新加载
+});
+
+// 手动读取
+const data = await getEmoticons();  // 返回 Array 或 null
+
+// 手动保存
+await saveEmoticons([...]);  // 保存自定义数据
+
+// 清空缓存
+await clearEmoticons();
+
+// 获取统计信息
+const stats = await getStorageStats();
+// { hasData: true, count: 100, sizeKB: "12.34" }
+```
+
+**使用场景：**
+1. **首次使用**：自动从 `defaultURL` 加载并缓存
+2. **后续使用**：直接从 IndexedDB 读取（快速 + 离线可用）
+3. **自定义数据**：用户可以保存自己的颜文字配置
+4. **降级处理**：远程加载失败时返回空数组，不影响主流程
 
 ## 许可证
 

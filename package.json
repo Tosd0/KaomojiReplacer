@@ -2,7 +2,25 @@
   "name": "emoticon-replacer",
   "version": "1.0.0",
   "description": "基于 BM25 算法的颜文字替换插件",
-  "main": "src/core/EmoticonReplacer.js",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "exports": {
+    ".": {
+      "require": "./index.js",
+      "import": "./index.js",
+      "types": "./index.d.ts"
+    },
+    "./core": {
+      "require": "./src/core/EmoticonReplacer.js"
+    },
+    "./data-manager": {
+      "require": "./src/core/EmoticonDataManager.js"
+    },
+    "./search-engine": {
+      "require": "./src/core/SearchEngine.js"
+    },
+    "./package.json": "./package.json"
+  },
   "scripts": {
     "test": "node examples/test.js"
   },
@@ -12,12 +30,23 @@
     "text-replacement",
     "bm25",
     "search",
-    "sillytavern"
+    "sillytavern",
+    "api",
+    "library",
+    "text-processing"
   ],
   "author": "Tosd0",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/Tosd0/EmoticonReplacer"
-  }
+  },
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "src/",
+    "data/",
+    "README.md",
+    "LICENSE"
+  ]
 }
