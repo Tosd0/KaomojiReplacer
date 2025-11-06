@@ -167,6 +167,11 @@ function validateData(data) {
     }
 
     data.forEach((item, index) => {
+        if (typeof item !== 'object' || item === null) {
+            errors.push(`Item ${index}: Must be an object.`);
+            return;
+        }
+
         if (!item.emoticon || typeof item.emoticon !== 'string') {
             errors.push(`Item ${index}: Missing or invalid 'emoticon' field`);
         }
