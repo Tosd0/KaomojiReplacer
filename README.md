@@ -32,7 +32,7 @@
 ```javascript
 // 1. 创建数据管理器并加载数据
 const manager = new EmoticonDataManager();
-const response = await fetch('data/emoticons.json');
+const response = await fetch('data/emoticons.template.json');
 const jsonText = await response.text();
 manager.loadFromJSON(jsonText);
 

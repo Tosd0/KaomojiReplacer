@@ -23,7 +23,7 @@ class SearchEngine {
     buildIndex(emoticons) {
         this.documents = emoticons.map(item => ({
             emoticon: item.emoticon,
-            keywords: item.keywords,
+            keywords: [...item.keywords],
             weight: item.weight || 1.0,
             category: item.category || ''
         }));
@@ -141,7 +141,7 @@ class SearchEngine {
             // 提取所有可能的词组合（2-4字）
             for (let len = 2; len <= Math.min(4, chunk.length); len++) {
                 for (let i = 0; i <= chunk.length - len; i++) {
-                    words.push(chunk.substr(i, len));
+                    words.push(chunk.slice(i, i + len));
                 }
             }
             // 也加入单字

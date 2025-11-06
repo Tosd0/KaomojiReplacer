@@ -197,7 +197,7 @@ class EmoticonReplacerExtension {
         if (!message) return false;
 
         // 初始化 extra 对象
-        if (typeof message.extra !== 'object') {
+        if (!message.extra) {
             message.extra = {};
         }
 
