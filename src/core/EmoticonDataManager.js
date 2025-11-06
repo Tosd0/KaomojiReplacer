@@ -179,7 +179,10 @@ class EmoticonDataManager {
         return {
             totalEmoticons: this.emoticons.length,
             totalKeywords: this.getAllKeywords().length,
-            totalCategories: this.getAllCategories().length
+            totalCategories: this.getAllCategories().length,
+            averageKeywordsPerEmoticon: this.emoticons.length > 0
+                ? this.emoticons.reduce((sum, e) => sum + e.keywords.length, 0) / this.emoticons.length
+                : 0
         };
     }
 

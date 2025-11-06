@@ -73,28 +73,47 @@ class EmoticonReplacerExtension {
     }
 
     /**
-     * 加载 emoticon 数据
+     * 加载 emoticon 数据（带回退机制）
      */
     async loadEmoticonData() {
+        const manager = new EmoticonDataManager();
+
         try {
-            // 从文件加载数据
+            // 尝试加载用户自定义数据
             const response = await fetch(this.settings.dataPath);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             const jsonText = await response.text();
-
-            // 使用 EmoticonDataManager 管理数据
-            const manager = new EmoticonDataManager();
             manager.loadFromJSON(jsonText);
 
-            // 加载到替换器
             const data = manager.getAllEmoticons();
             this.replacer.loadEmoticons(data);
-            console.log(`Loaded ${data.length} emoticons`);
+            console.log(`Loaded ${data.length} emoticons from ${this.settings.dataPath}`);
+
         } catch (error) {
-            console.error('Failed to load emoticon data:', error);
-            throw error;
+            console.warn('Failed to load custom emoticon data, trying template:', error.message);
+
+            try {
+                // 回退：尝试加载模板数据
+                const templatePath = this.settings.dataPath.replace('emoticons.json', 'emoticons.template.json');
+                const response = await fetch(templatePath);
+
+                if (!response.ok) {
+                    throw new Error(`Template not found: ${response.status}`);
+                }
+
+                const jsonText = await response.text();
+                manager.loadFromJSON(jsonText);
+
+                const data = manager.getAllEmoticons();
+                this.replacer.loadEmoticons(data);
+                console.log(`Loaded ${data.length} emoticons from template (fallback)`);
+
+            } catch (fallbackError) {
+                console.error('Failed to load template data:', fallbackError);
+                throw new Error('No emoticon data available. Please create emoticons.json or check emoticons.template.json');
+            }
         }
     }
 

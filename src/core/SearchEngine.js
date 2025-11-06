@@ -107,11 +107,14 @@ class SearchEngine {
             return [];
         }
 
+        // 转换为 Set 以提高查找效率 (O(1) vs O(n))
+        const queryTermsSet = new Set(queryTerms);
+
         // 计算每个文档的分数
         const results = this.documents.map(doc => ({
             emoticon: doc.emoticon,
             score: this._calculateBM25(queryTerms, doc),
-            matchedKeywords: doc.keywords.filter(k => queryTerms.includes(k)),
+            matchedKeywords: doc.keywords.filter(k => queryTermsSet.has(k)),
             category: doc.category
         }));
 

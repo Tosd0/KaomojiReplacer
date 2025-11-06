@@ -4,10 +4,6 @@
  * 运行: node examples/test.js
  */
 
-// 模拟浏览器环境（用于 Node.js）
-global.window = global;
-global.module = { exports: {} };
-
 // 加载模块
 const SearchEngine = require('../src/core/SearchEngine.js');
 const EmoticonReplacer = require('../src/core/EmoticonReplacer.js');
