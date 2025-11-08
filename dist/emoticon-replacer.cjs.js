@@ -1,5 +1,5 @@
 /**
- * Emoticon Replacer v1.0.4
+ * Kaomoji Replacer v1.0.4
  * 基于 BM25 算法的颜文字替换插件
  * (c) 2025 Tosd0
  * @license MIT
@@ -7,19 +7,19 @@
 'use strict';
 
 /**
- * EmoticonReplacer.js
+ * KaomojiReplacer.js
  * 核心替换引擎 - 可独立使用，不依赖任何框架
- * 负责检测文本中的标记并替换为对应的 emoticon
+ * 负责检测文本中的标记并替换为对应的 kaomoji
  */
 
-class EmoticonReplacer {
+class KaomojiReplacer {
     constructor(searchEngine) {
         this.searchEngine = searchEngine;
 
         // 标记格式配置
         this.config = {
-            // 标记的正则表达式: [emoticon:关键词1,关键词2,...]
-            markerPattern: /\[emoticon:([^\]]+)\]/gi,
+            // 标记的正则表达式: [kaomoji:关键词1,关键词2,...]
+            markerPattern: /\[kaomoji:([^\]]+)\]/gi,
             // 分隔符
             keywordSeparator: ',',
             // 替换策略: 'first' | 'best' | 'all'
@@ -36,15 +36,15 @@ class EmoticonReplacer {
     }
 
     /**
-     * 加载 emoticon 数据
-     * @param {Array} emoticons - emoticon 数据数组
+     * 加载 kaomoji 数据
+     * @param {Array} kaomojis - kaomoji 数据数组
      */
-    loadEmoticons(emoticons) {
-        this.searchEngine.buildIndex(emoticons);
+    loadKaomojis(kaomojis) {
+        this.searchEngine.buildIndex(kaomojis);
     }
 
     /**
-     * 处理文本，替换所有标记为 emoticon
+     * 处理文本，替换所有标记为 kaomoji
      * @param {string} text - 输入文本
      * @param {Object} options - 替换选项
      * @returns {Object} 包含替换后的文本和替换信息
@@ -73,36 +73,36 @@ class EmoticonReplacer {
                 return keepOriginalOnNotFound ? match : '';
             }
 
-            // 搜索匹配的 emoticon
+            // 搜索匹配的 kaomoji
             const searchText = keywords.join(' ');
             const matches = this.searchEngine.search(searchText, 5, threshold);
 
             let replacement = '';
-            let selectedEmoticon = null;
+            let selectedKaomoji = null;
 
             if (matches.length > 0) {
-                // 根据策略选择 emoticon
+                // 根据策略选择 kaomoji
                 switch (strategy) {
                     case 'first':
-                        selectedEmoticon = matches[0];
-                        replacement = matches[0].emoticon;
+                        selectedKaomoji = matches[0];
+                        replacement = matches[0].kaomoji;
                         break;
 
                     case 'best':
                         // 选择分数最高的
-                        selectedEmoticon = matches[0];
-                        replacement = matches[0].emoticon;
+                        selectedKaomoji = matches[0];
+                        replacement = matches[0].kaomoji;
                         break;
 
                     case 'all':
-                        // 返回所有匹配的 emoticon
-                        replacement = matches.map(m => m.emoticon).join(' ');
-                        selectedEmoticon = matches;
+                        // 返回所有匹配的 kaomoji
+                        replacement = matches.map(m => m.kaomoji).join(' ');
+                        selectedKaomoji = matches;
                         break;
 
                     default:
-                        selectedEmoticon = matches[0];
-                        replacement = matches[0].emoticon;
+                        selectedKaomoji = matches[0];
+                        replacement = matches[0].kaomoji;
                 }
 
                 // 记录替换信息
@@ -110,20 +110,20 @@ class EmoticonReplacer {
                     index: matchIndex++,
                     original: match,
                     keywords: keywords,
-                    emoticon: replacement,
+                    kaomoji: replacement,
                     offset: offset,
                     matches: matches,
-                    selected: selectedEmoticon
+                    selected: selectedKaomoji
                 });
 
                 return replacement;
             } else {
-                // 没有找到匹配的 emoticon
+                // 没有找到匹配的 kaomoji
                 replacements.push({
                     index: matchIndex++,
                     original: match,
                     keywords: keywords,
-                    emoticon: null,
+                    kaomoji: null,
                     offset: offset,
                     matches: [],
                     selected: null,
@@ -191,7 +191,7 @@ class EmoticonReplacer {
     }
 
     /**
-     * 查询关键词对应的 emoticon（不需要标记格式）
+     * 查询关键词对应的 kaomoji（不需要标记格式）
      * @param {string} keywords - 关键词字符串
      * @param {number} topK - 返回前 K 个结果
      * @returns {Array} 匹配结果
@@ -215,7 +215,7 @@ class EmoticonReplacer {
      */
     getStats() {
         return {
-            totalEmoticons: this.searchEngine.documents.length,
+            totalKaomojis: this.searchEngine.documents.length,
             avgDocLength: this.searchEngine.avgDocLength,
             config: { ...this.config }
         };
@@ -235,18 +235,18 @@ class SearchEngine {
         this.b = config.b || 0.75;   // 长度归一化参数
 
         // 索引数据
-        this.documents = [];         // 文档列表（每个emoticon的keywords作为一个文档）
+        this.documents = [];         // 文档列表（每个kaomoji的keywords作为一个文档）
         this.avgDocLength = 0;       // 平均文档长度
         this.idf = new Map();        // IDF 值缓存
     }
 
     /**
      * 构建索引
-     * @param {Array} emoticons - emoticon 数据数组
+     * @param {Array} kaomojis - kaomoji 数据数组
      */
-    buildIndex(emoticons) {
-        this.documents = emoticons.map(item => ({
-            emoticon: item.emoticon,
+    buildIndex(kaomojis) {
+        this.documents = kaomojis.map(item => ({
+            kaomoji: item.kaomoji,
             keywords: [...item.keywords],
             weight: item.weight || 1.0,
             category: item.category || ''
@@ -313,7 +313,7 @@ class SearchEngine {
     }
 
     /**
-     * 搜索匹配的 emoticon
+     * 搜索匹配的 kaomoji
      * @param {string} text - 要搜索的文本
      * @param {number} topK - 返回前 K 个结果
      * @param {number} threshold - 最低分数阈值
@@ -336,7 +336,7 @@ class SearchEngine {
 
         // 计算每个文档的分数
         const results = this.documents.map(doc => ({
-            emoticon: doc.emoticon,
+            kaomoji: doc.kaomoji,
             score: this._calculateBM25(queryTerms, doc),
             matchedKeywords: doc.keywords.filter(k => queryTermsSet.has(k)),
             category: doc.category
@@ -395,7 +395,7 @@ class SearchEngine {
 
             if (matchedKeywords.length > 0) {
                 results.push({
-                    emoticon: doc.emoticon,
+                    kaomoji: doc.kaomoji,
                     matchedKeywords: matchedKeywords,
                     score: matchedKeywords.length * doc.weight,
                     category: doc.category
@@ -408,13 +408,13 @@ class SearchEngine {
 }
 
 /**
- * EmoticonDataManager.js
+ * KaomojiDataManager.js
  * 颜文字数据管理类 - 完整 CRUD
  */
 
-class EmoticonDataManager {
+class KaomojiDataManager {
     constructor() {
-        this.emoticons = [];
+        this.kaomojis = [];
     }
 
     // ========== 数据加载 ==========
@@ -422,7 +422,7 @@ class EmoticonDataManager {
     /**
      * 从 JSON 字符串加载数据
      * @param {string} jsonString - JSON 字符串
-     * @returns {EmoticonDataManager} 链式调用
+     * @returns {KaomojiDataManager} 链式调用
      */
     loadFromJSON(jsonString) {
         try {
@@ -437,21 +437,21 @@ class EmoticonDataManager {
     /**
      * 从对象数组加载数据
      * @param {Array} data - 颜文字数据数组
-     * @returns {EmoticonDataManager} 链式调用
+     * @returns {KaomojiDataManager} 链式调用
      */
     loadFromArray(data) {
         if (!Array.isArray(data)) {
             throw new Error('Data must be an array');
         }
 
-        this.emoticons = [];
+        this.kaomojis = [];
         data.forEach((item, index) => {
             if (this._validateItem(item, index)) {
-                this.emoticons.push(this._normalizeItem(item));
+                this.kaomojis.push(this._normalizeItem(item));
             }
         });
 
-        console.log(`Loaded ${this.emoticons.length} emoticons`);
+        console.log(`Loaded ${this.kaomojis.length} kaomojis`);
         return this;
     }
 
@@ -460,8 +460,8 @@ class EmoticonDataManager {
      * @private
      */
     _validateItem(item, index) {
-        if (!item.emoticon || typeof item.emoticon !== 'string') {
-            console.warn(`Item ${index}: Missing or invalid 'emoticon' field, skipping`);
+        if (!item.kaomoji || typeof item.kaomoji !== 'string') {
+            console.warn(`Item ${index}: Missing or invalid 'kaomoji' field, skipping`);
             return false;
         }
 
@@ -479,7 +479,7 @@ class EmoticonDataManager {
      */
     _normalizeItem(item) {
         return {
-            emoticon: item.emoticon,
+            kaomoji: item.kaomoji,
             keywords: item.keywords.map(k => String(k).trim()).filter(k => k.length > 0),
             weight: typeof item.weight === 'number' ? item.weight : 1.0,
             category: item.category || ''
@@ -494,7 +494,7 @@ class EmoticonDataManager {
      */
     _deepCopy(item) {
         return {
-            emoticon: item.emoticon,
+            kaomoji: item.kaomoji,
             keywords: [...item.keywords],
             weight: item.weight,
             category: item.category
@@ -507,17 +507,17 @@ class EmoticonDataManager {
      * 获取所有颜文字（深拷贝）
      * @returns {Array} 颜文字数组的深拷贝
      */
-    getAllEmoticons() {
-        return this.emoticons.map(item => this._deepCopy(item));
+    getAllKaomojis() {
+        return this.kaomojis.map(item => this._deepCopy(item));
     }
 
     /**
      * 通过颜文字文本查找（深拷贝）
-     * @param {string} emoticon - 颜文字文本
+     * @param {string} kaomoji - 颜文字文本
      * @returns {Object|null} 颜文字对象的深拷贝，未找到返回 null
      */
-    getEmoticonByText(emoticon) {
-        const found = this.emoticons.find(item => item.emoticon === emoticon);
+    getKaomojiByText(kaomoji) {
+        const found = this.kaomojis.find(item => item.kaomoji === kaomoji);
         return found ? this._deepCopy(found) : null;
     }
 
@@ -527,7 +527,7 @@ class EmoticonDataManager {
      */
     getAllKeywords() {
         const keywords = new Set();
-        this.emoticons.forEach(item => {
+        this.kaomojis.forEach(item => {
             item.keywords.forEach(keyword => keywords.add(keyword));
         });
         return Array.from(keywords).sort();
@@ -535,11 +535,11 @@ class EmoticonDataManager {
 
     /**
      * 获取特定颜文字的关键词
-     * @param {string} emoticon - 颜文字文本
+     * @param {string} kaomoji - 颜文字文本
      * @returns {Array} 关键词数组，未找到返回空数组
      */
-    getKeywordsByEmoticon(emoticon) {
-        const item = this.emoticons.find(e => e.emoticon === emoticon);
+    getKeywordsByKaomoji(kaomoji) {
+        const item = this.kaomojis.find(e => e.kaomoji === kaomoji);
         return item ? [...item.keywords] : [];
     }
 
@@ -550,7 +550,7 @@ class EmoticonDataManager {
      */
     filterByCategory(category) {
         const categories = Array.isArray(category) ? category : [category];
-        return this.emoticons
+        return this.kaomojis
             .filter(item => categories.includes(item.category))
             .map(item => this._deepCopy(item));
     }
@@ -561,7 +561,7 @@ class EmoticonDataManager {
      */
     getAllCategories() {
         const categories = new Set();
-        this.emoticons.forEach(item => {
+        this.kaomojis.forEach(item => {
             if (item.category) {
                 categories.add(item.category);
             }
@@ -575,7 +575,7 @@ class EmoticonDataManager {
      * @returns {Array} 包含该关键词的颜文字数组的深拷贝
      */
     findByKeyword(keyword) {
-        return this.emoticons
+        return this.kaomojis
             .filter(item => item.keywords.includes(keyword))
             .map(item => this._deepCopy(item));
     }
@@ -586,11 +586,11 @@ class EmoticonDataManager {
      */
     getStats() {
         return {
-            totalEmoticons: this.emoticons.length,
+            totalKaomojis: this.kaomojis.length,
             totalKeywords: this.getAllKeywords().length,
             totalCategories: this.getAllCategories().length,
-            averageKeywordsPerEmoticon: this.emoticons.length > 0
-                ? this.emoticons.reduce((sum, e) => sum + e.keywords.length, 0) / this.emoticons.length
+            averageKeywordsPerKaomoji: this.kaomojis.length > 0
+                ? this.kaomojis.reduce((sum, e) => sum + e.keywords.length, 0) / this.kaomojis.length
                 : 0
         };
     }
@@ -599,14 +599,14 @@ class EmoticonDataManager {
 
     /**
      * 添加关键词
-     * @param {string} emoticon - 颜文字文本
+     * @param {string} kaomoji - 颜文字文本
      * @param {string} keyword - 要添加的关键词
      * @returns {boolean} 是否成功
      */
-    addKeyword(emoticon, keyword) {
-        const item = this.emoticons.find(e => e.emoticon === emoticon);
+    addKeyword(kaomoji, keyword) {
+        const item = this.kaomojis.find(e => e.kaomoji === kaomoji);
         if (!item) {
-            console.warn(`Emoticon "${emoticon}" not found`);
+            console.warn(`Kaomoji "${kaomoji}" not found`);
             return false;
         }
 
@@ -627,14 +627,14 @@ class EmoticonDataManager {
 
     /**
      * 删除关键词
-     * @param {string} emoticon - 颜文字文本
+     * @param {string} kaomoji - 颜文字文本
      * @param {string} keyword - 要删除的关键词
      * @returns {boolean} 是否成功
      */
-    removeKeyword(emoticon, keyword) {
-        const item = this.emoticons.find(e => e.emoticon === emoticon);
+    removeKeyword(kaomoji, keyword) {
+        const item = this.kaomojis.find(e => e.kaomoji === kaomoji);
         if (!item) {
-            console.warn(`Emoticon "${emoticon}" not found`);
+            console.warn(`Kaomoji "${kaomoji}" not found`);
             return false;
         }
 
@@ -655,14 +655,14 @@ class EmoticonDataManager {
 
     /**
      * 批量更新关键词
-     * @param {string} emoticon - 颜文字文本
+     * @param {string} kaomoji - 颜文字文本
      * @param {Array} keywords - 新的关键词数组
      * @returns {boolean} 是否成功
      */
-    updateKeywords(emoticon, keywords) {
-        const item = this.emoticons.find(e => e.emoticon === emoticon);
+    updateKeywords(kaomoji, keywords) {
+        const item = this.kaomojis.find(e => e.kaomoji === kaomoji);
         if (!item) {
-            console.warn(`Emoticon "${emoticon}" not found`);
+            console.warn(`Kaomoji "${kaomoji}" not found`);
             return false;
         }
 
@@ -686,14 +686,14 @@ class EmoticonDataManager {
 
     /**
      * 设置分类
-     * @param {string} emoticon - 颜文字文本
+     * @param {string} kaomoji - 颜文字文本
      * @param {string} category - 分类名称
      * @returns {boolean} 是否成功
      */
-    setCategory(emoticon, category) {
-        const item = this.emoticons.find(e => e.emoticon === emoticon);
+    setCategory(kaomoji, category) {
+        const item = this.kaomojis.find(e => e.kaomoji === kaomoji);
         if (!item) {
-            console.warn(`Emoticon "${emoticon}" not found`);
+            console.warn(`Kaomoji "${kaomoji}" not found`);
             return false;
         }
 
@@ -703,14 +703,14 @@ class EmoticonDataManager {
 
     /**
      * 设置权重
-     * @param {string} emoticon - 颜文字文本
+     * @param {string} kaomoji - 颜文字文本
      * @param {number} weight - 权重值
      * @returns {boolean} 是否成功
      */
-    setWeight(emoticon, weight) {
-        const item = this.emoticons.find(e => e.emoticon === emoticon);
+    setWeight(kaomoji, weight) {
+        const item = this.kaomojis.find(e => e.kaomoji === kaomoji);
         if (!item) {
-            console.warn(`Emoticon "${emoticon}" not found`);
+            console.warn(`Kaomoji "${kaomoji}" not found`);
             return false;
         }
 
@@ -727,50 +727,50 @@ class EmoticonDataManager {
 
     /**
      * 添加新颜文字
-     * @param {Object} data - 颜文字数据 { emoticon, keywords, weight?, category? }
+     * @param {Object} data - 颜文字数据 { kaomoji, keywords, weight?, category? }
      * @returns {boolean} 是否成功
      */
-    addEmoticon(data) {
+    addKaomoji(data) {
         if (!this._validateItem(data, 'new')) {
             return false;
         }
 
         // 检查是否已存在
-        if (this.emoticons.find(e => e.emoticon === data.emoticon)) {
-            console.warn(`Emoticon "${data.emoticon}" already exists`);
+        if (this.kaomojis.find(e => e.kaomoji === data.kaomoji)) {
+            console.warn(`Kaomoji "${data.kaomoji}" already exists`);
             return false;
         }
 
-        this.emoticons.push(this._normalizeItem(data));
+        this.kaomojis.push(this._normalizeItem(data));
         return true;
     }
 
     /**
      * 删除颜文字
-     * @param {string} emoticon - 颜文字文本
+     * @param {string} kaomoji - 颜文字文本
      * @returns {boolean} 是否成功
      */
-    removeEmoticon(emoticon) {
-        const index = this.emoticons.findIndex(e => e.emoticon === emoticon);
+    removeKaomoji(kaomoji) {
+        const index = this.kaomojis.findIndex(e => e.kaomoji === kaomoji);
         if (index === -1) {
-            console.warn(`Emoticon "${emoticon}" not found`);
+            console.warn(`Kaomoji "${kaomoji}" not found`);
             return false;
         }
 
-        this.emoticons.splice(index, 1);
+        this.kaomojis.splice(index, 1);
         return true;
     }
 
     /**
      * 更新颜文字完整数据
-     * @param {string} emoticon - 原颜文字文本
+     * @param {string} kaomoji - 原颜文字文本
      * @param {Object} newData - 新数据
      * @returns {boolean} 是否成功
      */
-    updateEmoticon(emoticon, newData) {
-        const index = this.emoticons.findIndex(e => e.emoticon === emoticon);
+    updateKaomoji(kaomoji, newData) {
+        const index = this.kaomojis.findIndex(e => e.kaomoji === kaomoji);
         if (index === -1) {
-            console.warn(`Emoticon "${emoticon}" not found`);
+            console.warn(`Kaomoji "${kaomoji}" not found`);
             return false;
         }
 
@@ -778,15 +778,15 @@ class EmoticonDataManager {
             return false;
         }
 
-        // 如果更改了 emoticon 文本，检查新文本是否已存在
-        if (newData.emoticon !== emoticon) {
-            if (this.emoticons.find(e => e.emoticon === newData.emoticon)) {
-                console.warn(`Emoticon "${newData.emoticon}" already exists`);
+        // 如果更改了 kaomoji 文本，检查新文本是否已存在
+        if (newData.kaomoji !== kaomoji) {
+            if (this.kaomojis.find(e => e.kaomoji === newData.kaomoji)) {
+                console.warn(`Kaomoji "${newData.kaomoji}" already exists`);
                 return false;
             }
         }
 
-        this.emoticons[index] = this._normalizeItem(newData);
+        this.kaomojis[index] = this._normalizeItem(newData);
         return true;
     }
 
@@ -798,7 +798,7 @@ class EmoticonDataManager {
      * @returns {string} JSON 字符串
      */
     exportToJSON(pretty = true) {
-        return JSON.stringify(this.emoticons, null, pretty ? 2 : 0);
+        return JSON.stringify(this.kaomojis, null, pretty ? 2 : 0);
     }
 
     /**
@@ -806,21 +806,21 @@ class EmoticonDataManager {
      * @returns {Array} 颜文字数组的深拷贝
      */
     exportToArray() {
-        return this.emoticons.map(item => ({ ...item, keywords: [...item.keywords] }));
+        return this.kaomojis.map(item => ({ ...item, keywords: [...item.keywords] }));
     }
 
     // ========== 批量操作 ==========
 
     /**
      * 批量修改分类
-     * @param {Array} emoticons - 颜文字文本数组
+     * @param {Array} kaomojis - 颜文字文本数组
      * @param {string} category - 分类名称
      * @returns {number} 成功修改的数量
      */
-    batchSetCategory(emoticons, category) {
+    batchSetCategory(kaomojis, category) {
         let count = 0;
-        emoticons.forEach(emoticon => {
-            if (this.setCategory(emoticon, category)) {
+        kaomojis.forEach(kaomoji => {
+            if (this.setCategory(kaomoji, category)) {
                 count++;
             }
         });
@@ -829,13 +829,13 @@ class EmoticonDataManager {
 
     /**
      * 批量删除颜文字
-     * @param {Array} emoticons - 颜文字文本数组
+     * @param {Array} kaomojis - 颜文字文本数组
      * @returns {number} 成功删除的数量
      */
-    batchRemove(emoticons) {
+    batchRemove(kaomojis) {
         let count = 0;
-        emoticons.forEach(emoticon => {
-            if (this.removeEmoticon(emoticon)) {
+        kaomojis.forEach(kaomoji => {
+            if (this.removeKaomoji(kaomoji)) {
                 count++;
             }
         });
@@ -846,7 +846,7 @@ class EmoticonDataManager {
      * 清空所有数据
      */
     clear() {
-        this.emoticons = [];
+        this.kaomojis = [];
     }
 }
 
@@ -856,10 +856,10 @@ class EmoticonDataManager {
  * 用于在浏览器中持久化颜文字数据
  */
 
-const DB_NAME = 'EmoticonReplacerDB';
+const DB_NAME = 'KaomojiReplacerDB';
 const DB_VERSION = 1;
-const STORE_NAME = 'emoticons';
-const DATA_KEY = 'emoticon_data';
+const STORE_NAME = 'kaomojis';
+const DATA_KEY = 'kaomoji_data';
 
 // 调试开关（默认关闭）
 let DEBUG_MODE = false;
@@ -877,22 +877,22 @@ function setDebugMode$1(enabled) {
  */
 function debugLog(message, ...args) {
     if (DEBUG_MODE) {
-        console.log(`[EmoticonReplacer] ${message}`, ...args);
+        console.log(`[KaomojiReplacer] ${message}`, ...args);
     }
 }
 
 function debugWarn(message, ...args) {
     if (DEBUG_MODE) {
-        console.warn(`[EmoticonReplacer] ${message}`, ...args);
+        console.warn(`[KaomojiReplacer] ${message}`, ...args);
     }
 }
 
 function debugError(message, ...args) {
     // 错误总是输出，但在非调试模式下简化
     if (DEBUG_MODE) {
-        console.error(`[EmoticonReplacer] ${message}`, ...args);
+        console.error(`[KaomojiReplacer] ${message}`, ...args);
     } else {
-        console.error(`[EmoticonReplacer] ${message}`);
+        console.error(`[KaomojiReplacer] ${message}`);
     }
 }
 
@@ -932,7 +932,7 @@ function openDatabase() {
  * 从 IndexedDB 读取颜文字数据
  * @returns {Promise<Array|null>} 颜文字数组，不存在返回 null
  */
-async function getEmoticons$1() {
+async function getKaomojis$1() {
     try {
         const db = await openDatabase();
 
@@ -969,7 +969,7 @@ async function getEmoticons$1() {
  * @param {Array} data - 颜文字数组
  * @returns {Promise<boolean>} 是否成功
  */
-async function saveEmoticons$1(data) {
+async function saveKaomojis$1(data) {
     if (!Array.isArray(data)) {
         debugError('Data must be an array');
         return false;
@@ -985,7 +985,7 @@ async function saveEmoticons$1(data) {
 
             transaction.oncomplete = () => {
                 db.close();
-                debugLog(`Saved ${data.length} emoticons to IndexedDB`);
+                debugLog(`Saved ${data.length} kaomojis to IndexedDB`);
                 resolve(true);
             };
 
@@ -1008,7 +1008,7 @@ async function saveEmoticons$1(data) {
  * 清空 IndexedDB 中的颜文字数据
  * @returns {Promise<boolean>} 是否成功
  */
-async function clearEmoticons$1() {
+async function clearKaomojis$1() {
     try {
         const db = await openDatabase();
 
@@ -1019,7 +1019,7 @@ async function clearEmoticons$1() {
 
             transaction.oncomplete = () => {
                 db.close();
-                debugLog('Cleared emoticons from IndexedDB');
+                debugLog('Cleared kaomojis from IndexedDB');
                 resolve(true);
             };
 
@@ -1077,7 +1077,7 @@ async function loadFromRemote(url) {
  * @param {boolean} options.forceReload - 是否强制重新加载（忽略缓存）
  * @returns {Promise<Array>} 颜文字数组
  */
-async function initEmoticonStorage$1(options = {}) {
+async function initKaomojiStorage$1(options = {}) {
     const {
         defaultURL = null,
         forceReload = false
@@ -1086,22 +1086,22 @@ async function initEmoticonStorage$1(options = {}) {
     try {
         // 检查 IndexedDB 是否已有数据
         if (!forceReload) {
-            const existingData = await getEmoticons$1();
+            const existingData = await getKaomojis$1();
             if (existingData && existingData.length > 0) {
-                debugLog(`Loaded ${existingData.length} emoticons from IndexedDB cache`);
+                debugLog(`Loaded ${existingData.length} kaomojis from IndexedDB cache`);
                 return existingData;
             }
         }
 
         // 如果没有数据且提供了远程 URL，尝试加载
         if (defaultURL) {
-            debugLog(`Loading default emoticons from ${defaultURL}...`);
+            debugLog(`Loading default kaomojis from ${defaultURL}...`);
             const remoteData = await loadFromRemote(defaultURL);
 
             if (remoteData && remoteData.length > 0) {
                 // 保存到 IndexedDB
-                await saveEmoticons$1(remoteData);
-                debugLog(`Initialized with ${remoteData.length} emoticons from remote`);
+                await saveKaomojis$1(remoteData);
+                debugLog(`Initialized with ${remoteData.length} kaomojis from remote`);
                 return remoteData;
             } else {
                 debugWarn('Failed to load from remote, returning empty array');
@@ -1111,7 +1111,7 @@ async function initEmoticonStorage$1(options = {}) {
         // 返回空数组
         return [];
     } catch (error) {
-        debugError('Error initializing emoticon storage:', error);
+        debugError('Error initializing kaomoji storage:', error);
         return [];
     }
 }
@@ -1122,7 +1122,7 @@ async function initEmoticonStorage$1(options = {}) {
  */
 async function getStorageStats$1() {
     try {
-        const data = await getEmoticons$1();
+        const data = await getKaomojis$1();
 
         return {
             hasData: data !== null,
@@ -1141,38 +1141,38 @@ async function getStorageStats$1() {
 
 var IndexedDBStorage = /*#__PURE__*/Object.freeze({
     __proto__: null,
-    clearEmoticons: clearEmoticons$1,
-    getEmoticons: getEmoticons$1,
+    clearKaomojis: clearKaomojis$1,
+    getKaomojis: getKaomojis$1,
     getStorageStats: getStorageStats$1,
-    initEmoticonStorage: initEmoticonStorage$1,
-    saveEmoticons: saveEmoticons$1,
+    initKaomojiStorage: initKaomojiStorage$1,
+    saveKaomojis: saveKaomojis$1,
     setDebugMode: setDebugMode$1
 });
 
 /**
- * Emoticon Replacer - Unified API Entry Point
+ * Kaomoji Replacer - Unified API Entry Point
  *
  * 提供多种导入和使用方式：
- * 1. 类导入：const { EmoticonReplacer, SearchEngine, EmoticonDataManager } = require('emoticon-replacer');
- * 2. 工厂函数：const { createReplacer, createManager } = require('emoticon-replacer');
- * 3. 快捷 API：const { quickReplace } = require('emoticon-replacer');
+ * 1. 类导入：const { KaomojiReplacer, SearchEngine, KaomojiDataManager } = require('kaomoji-replacer');
+ * 2. 工厂函数：const { createReplacer, createManager } = require('kaomoji-replacer');
+ * 3. 快捷 API：const { quickReplace } = require('kaomoji-replacer');
  */
 
 
 // ========== 工厂函数 ==========
 
 /**
- * 创建一个完整配置的 EmoticonReplacer 实例
+ * 创建一个完整配置的 KaomojiReplacer 实例
  * @param {Object} options - 配置选项
- * @param {Array} options.emoticons - 颜文字数据数组
+ * @param {Array} options.kaomojis - 颜文字数据数组
  * @param {string} options.jsonData - JSON 格式的颜文字数据
  * @param {Object} options.searchConfig - SearchEngine 配置 { k1, b }
- * @param {Object} options.replaceConfig - EmoticonReplacer 配置
- * @returns {EmoticonReplacer} 配置好的 EmoticonReplacer 实例
+ * @param {Object} options.replaceConfig - KaomojiReplacer 配置
+ * @returns {KaomojiReplacer} 配置好的 KaomojiReplacer 实例
  */
 function createReplacer(options = {}) {
     const {
-        emoticons = [],
+        kaomojis = [],
         jsonData = null,
         searchConfig = {},
         replaceConfig = {}
@@ -1182,7 +1182,7 @@ function createReplacer(options = {}) {
     const searchEngine = new SearchEngine(searchConfig);
 
     // 创建替换器
-    const replacer = new EmoticonReplacer(searchEngine);
+    const replacer = new KaomojiReplacer(searchEngine);
 
     // 应用配置
     if (replaceConfig) {
@@ -1191,23 +1191,23 @@ function createReplacer(options = {}) {
 
     // 加载数据
     if (jsonData) {
-        const manager = new EmoticonDataManager();
+        const manager = new KaomojiDataManager();
         manager.loadFromJSON(jsonData);
-        replacer.loadEmoticons(manager.getAllEmoticons());
-    } else if (emoticons.length > 0) {
-        replacer.loadEmoticons(emoticons);
+        replacer.loadKaomojis(manager.getAllKaomojis());
+    } else if (kaomojis.length > 0) {
+        replacer.loadKaomojis(kaomojis);
     }
 
     return replacer;
 }
 
 /**
- * 创建 EmoticonDataManager 实例并加载数据
+ * 创建 KaomojiDataManager 实例并加载数据
  * @param {Array|string} data - 颜文字数据数组或 JSON 字符串
- * @returns {EmoticonDataManager} 加载好数据的 EmoticonDataManager 实例
+ * @returns {KaomojiDataManager} 加载好数据的 KaomojiDataManager 实例
  */
 function createManager(data = null) {
-    const manager = new EmoticonDataManager();
+    const manager = new KaomojiDataManager();
 
     if (data) {
         if (typeof data === 'string') {
@@ -1234,14 +1234,14 @@ function createSearchEngine(config = {}) {
 /**
  * 快速替换文本（一站式 API）
  * @param {string} text - 要处理的文本
- * @param {Array|string} emoticons - 颜文字数据（数组或 JSON 字符串）
+ * @param {Array|string} kaomojis - 颜文字数据（数组或 JSON 字符串）
  * @param {Object} options - 替换选项
  * @returns {Object} 替换结果
  */
-function quickReplace(text, emoticons, options = {}) {
+function quickReplace(text, kaomojis, options = {}) {
     const replacer = createReplacer({
-        emoticons: Array.isArray(emoticons) ? emoticons : [],
-        jsonData: typeof emoticons === 'string' ? emoticons : null,
+        kaomojis: Array.isArray(kaomojis) ? kaomojis : [],
+        jsonData: typeof kaomojis === 'string' ? kaomojis : null,
         searchConfig: options.searchConfig,
         replaceConfig: options.replaceConfig
     });
@@ -1252,14 +1252,14 @@ function quickReplace(text, emoticons, options = {}) {
 /**
  * 快速查询关键词对应的颜文字
  * @param {string} keywords - 关键词
- * @param {Array|string} emoticons - 颜文字数据
+ * @param {Array|string} kaomojis - 颜文字数据
  * @param {number} topK - 返回前 K 个结果
  * @returns {Array} 匹配结果
  */
-function quickQuery(keywords, emoticons, topK = 5) {
+function quickQuery(keywords, kaomojis, topK = 5) {
     const replacer = createReplacer({
-        emoticons: Array.isArray(emoticons) ? emoticons : [],
-        jsonData: typeof emoticons === 'string' ? emoticons : null
+        kaomojis: Array.isArray(kaomojis) ? kaomojis : [],
+        jsonData: typeof kaomojis === 'string' ? kaomojis : null
     });
 
     return replacer.query(keywords, topK);
@@ -1278,9 +1278,9 @@ async function loadFromFile(filePath) {
 
     const { promises: fs } = await import('fs');
     const fileContent = await fs.readFile(filePath, 'utf8');
-    const manager = new EmoticonDataManager();
+    const manager = new KaomojiDataManager();
     manager.loadFromJSON(fileContent);
-    return manager.getAllEmoticons();
+    return manager.getAllKaomojis();
 }
 
 /**
@@ -1296,9 +1296,9 @@ async function loadFromURL(url) {
     }
 
     const jsonText = await response.text();
-    const manager = new EmoticonDataManager();
+    const manager = new KaomojiDataManager();
     manager.loadFromJSON(jsonText);
-    return manager.getAllEmoticons();
+    return manager.getAllKaomojis();
 }
 
 // ========== 工具函数 ==========
@@ -1321,8 +1321,8 @@ function validateData(data) {
             return;
         }
 
-        if (!item.emoticon || typeof item.emoticon !== 'string') {
-            errors.push(`Item ${index}: Missing or invalid 'emoticon' field`);
+        if (!item.kaomoji || typeof item.kaomoji !== 'string') {
+            errors.push(`Item ${index}: Missing or invalid 'kaomoji' field`);
         }
 
         if (!item.keywords || !Array.isArray(item.keywords) || item.keywords.length === 0) {
@@ -1343,14 +1343,14 @@ function validateData(data) {
 /**
  * 批量处理文本数组
  * @param {Array<string>} texts - 文本数组
- * @param {Array|string} emoticons - 颜文字数据
+ * @param {Array|string} kaomojis - 颜文字数据
  * @param {Object} options - 替换选项
  * @returns {Array} 处理结果数组
  */
-function batchReplace(texts, emoticons, options = {}) {
+function batchReplace(texts, kaomojis, options = {}) {
     const replacer = createReplacer({
-        emoticons: Array.isArray(emoticons) ? emoticons : [],
-        jsonData: typeof emoticons === 'string' ? emoticons : null,
+        kaomojis: Array.isArray(kaomojis) ? kaomojis : [],
+        jsonData: typeof kaomojis === 'string' ? kaomojis : null,
         searchConfig: options.searchConfig,
         replaceConfig: options.replaceConfig
     });
@@ -1368,7 +1368,7 @@ const DEFAULT_CONFIG = {
         b: 0.75
     },
     replace: {
-        markerPattern: /\[emoticon:([^\]]+)\]/gi,
+        markerPattern: /\[kaomoji:([^\]]+)\]/gi,
         keywordSeparator: ',',
         replaceStrategy: 'best'
     }
@@ -1382,33 +1382,33 @@ const REPLACE_STRATEGIES = {
 
 // 导出 IndexedDB 存储函数（解构便于使用）
 const {
-    initEmoticonStorage,
-    getEmoticons,
-    saveEmoticons,
-    clearEmoticons,
+    initKaomojiStorage,
+    getKaomojis,
+    saveKaomojis,
+    clearKaomojis,
     getStorageStats,
     setDebugMode
 } = IndexedDBStorage;
 
 exports.DEFAULT_CONFIG = DEFAULT_CONFIG;
-exports.EmoticonDataManager = EmoticonDataManager;
-exports.EmoticonReplacer = EmoticonReplacer;
+exports.KaomojiDataManager = KaomojiDataManager;
+exports.KaomojiReplacer = KaomojiReplacer;
 exports.IndexedDBStorage = IndexedDBStorage;
 exports.REPLACE_STRATEGIES = REPLACE_STRATEGIES;
 exports.SearchEngine = SearchEngine;
 exports.VERSION = VERSION;
 exports.batchReplace = batchReplace;
-exports.clearEmoticons = clearEmoticons;
+exports.clearKaomojis = clearKaomojis;
 exports.createManager = createManager;
 exports.createReplacer = createReplacer;
 exports.createSearchEngine = createSearchEngine;
-exports.getEmoticons = getEmoticons;
+exports.getKaomojis = getKaomojis;
 exports.getStorageStats = getStorageStats;
-exports.initEmoticonStorage = initEmoticonStorage;
+exports.initKaomojiStorage = initKaomojiStorage;
 exports.loadFromFile = loadFromFile;
 exports.loadFromURL = loadFromURL;
 exports.quickQuery = quickQuery;
 exports.quickReplace = quickReplace;
-exports.saveEmoticons = saveEmoticons;
+exports.saveKaomojis = saveKaomojis;
 exports.setDebugMode = setDebugMode;
 exports.validateData = validateData;

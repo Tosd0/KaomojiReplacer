@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IndexedDB 存储演示 - Emoticon Replacer</title>
+    <title>IndexedDB 存储演示 - Kaomoji Replacer</title>
     <style>
         * {
             margin: 0;
@@ -214,8 +214,8 @@
             <div class="input-group">
                 <label for="defaultURL">默认数据 URL（可选）:</label>
                 <input type="text" id="defaultURL"
-                       placeholder="https://cdn.example.com/emoticons.json"
-                       value="../data/emoticons.template.json">
+                       placeholder="https://cdn.example.com/kaomojis.json"
+                       value="../data/kaomojis.template.json">
             </div>
             <button onclick="initStorage()">初始化存储</button>
             <button onclick="initStorage(true)" class="secondary">强制重新加载</button>
@@ -242,7 +242,7 @@
             <h2>2️⃣ 文本替换测试</h2>
             <div class="input-group">
                 <label for="inputText">输入文本:</label>
-                <textarea id="inputText" placeholder="今天[emoticon:开心,高兴]又学会了新技能！">今天真是[emoticon:无语,黑脸]，遇到了好多bug，想要[emoticon:掀桌,愤怒]！</textarea>
+                <textarea id="inputText" placeholder="今天[kaomoji:开心,高兴]又学会了新技能！">今天真是[kaomoji:无语,黑脸]，遇到了好多bug，想要[kaomoji:掀桌,愤怒]！</textarea>
             </div>
             <button onclick="replaceText()">替换文本</button>
             <div id="replaceOutput" class="output"></div>
@@ -269,11 +269,11 @@
     <script type="module">
         // 导入核心模块
         import SearchEngine from '../src/core/SearchEngine.js';
-        import EmoticonReplacer from '../src/core/EmoticonReplacer.js';
-        import EmoticonDataManager from '../src/core/EmoticonDataManager.js';
+        import KaomojiReplacer from '../src/core/KaomojiReplacer.js';
+        import KaomojiDataManager from '../src/core/KaomojiDataManager.js';
         import * as IndexedDBStorage from '../src/storage/IndexedDBStorage.js';
 
-        let currentEmoticons = [];
+        let currentKaomojis = [];
 
         // 日志记录
         function addLog(message, type = 'info') {
@@ -314,16 +314,16 @@
                 output.textContent = '正在初始化...';
                 output.className = 'output';
 
-                const emoticons = await IndexedDBStorage.initEmoticonStorage({
+                const kaomojis = await IndexedDBStorage.initKaomojiStorage({
                     defaultURL: url || null,
                     forceReload: forceReload
                 });
 
-                currentEmoticons = emoticons;
-                output.textContent = `✅ 初始化成功！加载了 ${emoticons.length} 个颜文字`;
+                currentKaomojis = kaomojis;
+                output.textContent = `✅ 初始化成功！加载了 ${kaomojis.length} 个颜文字`;
                 output.className = 'output success';
 
-                addLog(`初始化成功: ${emoticons.length} 个颜文字 ${forceReload ? '(强制重载)' : ''}`);
+                addLog(`初始化成功: ${kaomojis.length} 个颜文字 ${forceReload ? '(强制重载)' : ''}`);
                 await refreshStats();
             } catch (error) {
                 output.textContent = `❌ 初始化失败: ${error.message}`;
@@ -338,7 +338,7 @@
             const input = document.getElementById('inputText').value;
 
             try {
-                if (currentEmoticons.length === 0) {
+                if (currentKaomojis.length === 0) {
                     output.textContent = '⚠️ 请先初始化存储';
                     output.className = 'output error';
                     return;
@@ -346,8 +346,8 @@
 
                 // 创建替换器
                 const engine = new SearchEngine();
-                const replacer = new EmoticonReplacer(engine);
-                replacer.loadEmoticons(currentEmoticons);
+                const replacer = new KaomojiReplacer(engine);
+                replacer.loadKaomojis(currentKaomojis);
 
                 // 执行替换
                 const result = replacer.replaceText(input);
@@ -372,10 +372,10 @@
             const output = document.getElementById('manageOutput');
 
             try {
-                const data = await IndexedDBStorage.getEmoticons();
+                const data = await IndexedDBStorage.getKaomojis();
 
                 if (data) {
-                    currentEmoticons = data;
+                    currentKaomojis = data;
                     output.textContent = `✅ 读取成功！找到 ${data.length} 个颜文字`;
                     output.className = 'output success';
                     addLog(`从 IndexedDB 读取: ${data.length} 个颜文字`);
@@ -402,8 +402,8 @@
             const output = document.getElementById('manageOutput');
 
             try {
-                await IndexedDBStorage.clearEmoticons();
-                currentEmoticons = [];
+                await IndexedDBStorage.clearKaomojis();
+                currentKaomojis = [];
 
                 output.textContent = '✅ 缓存已清空';
                 output.className = 'output success';

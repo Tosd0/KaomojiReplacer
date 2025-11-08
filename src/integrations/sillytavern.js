@@ -4,9 +4,9 @@
  */
 
 // SillyTavern Extension 主类
-class EmoticonReplacerExtension {
+class KaomojiReplacerExtension {
     constructor() {
-        this.extensionName = 'emoticon-replacer';
+        this.extensionName = 'kaomoji-replacer';
         this.replacer = null;
         this.searchEngine = null;
         this.settings = {
@@ -18,7 +18,7 @@ class EmoticonReplacerExtension {
             replaceStrategy: 'best',        // 'first', 'best', 'all'
             keepOriginalOnNotFound: true,   // 找不到时保留原标记
             markNotFound: false,            // 找不到时标记为 [?...]
-            dataPath: 'scripts/extensions/emoticon-replacer/data/emoticons.json'
+            dataPath: 'scripts/extensions/kaomoji-replacer/data/kaomojis.json'
         };
 
         this.isInitialized = false;
@@ -28,14 +28,14 @@ class EmoticonReplacerExtension {
      * 初始化扩展
      */
     async init() {
-        console.log('Initializing Emoticon Replacer Extension...');
+        console.log('Initializing Kaomoji Replacer Extension...');
 
         try {
             // 加载核心模块
             await this.loadModules();
 
             // 加载数据
-            await this.loadEmoticonData();
+            await this.loadKaomojiData();
 
             // 注册事件监听器
             this.registerEventListeners();
@@ -44,11 +44,11 @@ class EmoticonReplacerExtension {
             this.createUI();
 
             this.isInitialized = true;
-            console.log('Emoticon Replacer Extension initialized successfully');
+            console.log('Kaomoji Replacer Extension initialized successfully');
 
             return true;
         } catch (error) {
-            console.error('Failed to initialize Emoticon Replacer Extension:', error);
+            console.error('Failed to initialize Kaomoji Replacer Extension:', error);
             return false;
         }
     }
@@ -60,23 +60,23 @@ class EmoticonReplacerExtension {
         // 注意: 实际使用时需要确保这些文件已经被加载
         // 可以通过 HTML script 标签或动态加载
         if (typeof SearchEngine === 'undefined' ||
-            typeof EmoticonReplacer === 'undefined' ||
-            typeof EmoticonDataManager === 'undefined') {
-            throw new Error('Core modules not loaded. Please include SearchEngine.js, EmoticonReplacer.js, and EmoticonDataManager.js');
+            typeof KaomojiReplacer === 'undefined' ||
+            typeof KaomojiDataManager === 'undefined') {
+            throw new Error('Core modules not loaded. Please include SearchEngine.js, KaomojiReplacer.js, and KaomojiDataManager.js');
         }
 
         this.searchEngine = new SearchEngine();
-        this.replacer = new EmoticonReplacer(this.searchEngine);
+        this.replacer = new KaomojiReplacer(this.searchEngine);
         this.replacer.setConfig({
             replaceStrategy: this.settings.replaceStrategy
         });
     }
 
     /**
-     * 加载 emoticon 数据（带回退机制）
+     * 加载 kaomoji 数据（带回退机制）
      */
-    async loadEmoticonData() {
-        const manager = new EmoticonDataManager();
+    async loadKaomojiData() {
+        const manager = new KaomojiDataManager();
 
         try {
             // 尝试加载用户自定义数据
@@ -87,16 +87,16 @@ class EmoticonReplacerExtension {
             const jsonText = await response.text();
             manager.loadFromJSON(jsonText);
 
-            const data = manager.getAllEmoticons();
-            this.replacer.loadEmoticons(data);
-            console.log(`Loaded ${data.length} emoticons from ${this.settings.dataPath}`);
+            const data = manager.getAllKaomojis();
+            this.replacer.loadKaomojis(data);
+            console.log(`Loaded ${data.length} kaomojis from ${this.settings.dataPath}`);
 
         } catch (error) {
-            console.warn('Failed to load custom emoticon data, trying template:', error.message);
+            console.warn('Failed to load custom kaomoji data, trying template:', error.message);
 
             try {
                 // 回退：尝试加载模板数据
-                const templatePath = this.settings.dataPath.replace('emoticons.json', 'emoticons.template.json');
+                const templatePath = this.settings.dataPath.replace('kaomojis.json', 'kaomojis.template.json');
                 const response = await fetch(templatePath);
 
                 if (!response.ok) {
@@ -106,13 +106,13 @@ class EmoticonReplacerExtension {
                 const jsonText = await response.text();
                 manager.loadFromJSON(jsonText);
 
-                const data = manager.getAllEmoticons();
-                this.replacer.loadEmoticons(data);
-                console.log(`Loaded ${data.length} emoticons from template (fallback)`);
+                const data = manager.getAllKaomojis();
+                this.replacer.loadKaomojis(data);
+                console.log(`Loaded ${data.length} kaomojis from template (fallback)`);
 
             } catch (fallbackError) {
                 console.error('Failed to load template data:', fallbackError);
-                throw new Error('No emoticon data available. Please create emoticons.json or check emoticons.template.json');
+                throw new Error('No kaomoji data available. Please create kaomojis.json or check kaomojis.template.json');
             }
         }
     }
@@ -221,8 +221,8 @@ class EmoticonReplacerExtension {
         }
 
         // 备份原始内容（如果还没有备份）
-        if (!message.extra.emoticon_original) {
-            message.extra.emoticon_original = originalContent;
+        if (!message.extra.kaomoji_original) {
+            message.extra.kaomoji_original = originalContent;
         }
 
         // 设置显示文本
@@ -252,8 +252,8 @@ class EmoticonReplacerExtension {
         }
 
         // 备份原始内容
-        if (!message.extra.emoticon_original) {
-            message.extra.emoticon_original = originalContent;
+        if (!message.extra.kaomoji_original) {
+            message.extra.kaomoji_original = originalContent;
         }
 
         // 直接修改消息内容
@@ -281,11 +281,11 @@ class EmoticonReplacerExtension {
         const context = getContext();
         const message = context.chat[messageId];
 
-        if (!message?.extra?.emoticon_original) {
+        if (!message?.extra?.kaomoji_original) {
             return false;
         }
 
-        const originalContent = message.extra.emoticon_original;
+        const originalContent = message.extra.kaomoji_original;
 
         if (this.settings.modifyMode === 'display') {
             delete message.extra.display_text;
@@ -293,7 +293,7 @@ class EmoticonReplacerExtension {
             message.mes = originalContent;
         }
 
-        delete message.extra.emoticon_original;
+        delete message.extra.kaomoji_original;
 
         updateMessageBlock(Number(messageId), message);
         await context.saveChat();
@@ -365,21 +365,21 @@ class EmoticonReplacerExtension {
 }
 
 // 创建全局实例
-let emoticonReplacerExtension = null;
+let kaomojiReplacerExtension = null;
 
 // SillyTavern 扩展入口点
 jQuery(async () => {
-    emoticonReplacerExtension = new EmoticonReplacerExtension();
+    kaomojiReplacerExtension = new KaomojiReplacerExtension();
 
     // 加载设置
-    emoticonReplacerExtension.loadSettings();
+    kaomojiReplacerExtension.loadSettings();
 
     // 初始化
-    await emoticonReplacerExtension.init();
+    await kaomojiReplacerExtension.init();
 });
 
 // 导出供外部使用
 if (typeof window !== 'undefined') {
-    window.EmoticonReplacerExtension = EmoticonReplacerExtension;
-    window.getEmoticonReplacerExtension = () => emoticonReplacerExtension;
+    window.KaomojiReplacerExtension = KaomojiReplacerExtension;
+    window.getKaomojiReplacerExtension = () => kaomojiReplacerExtension;
 }

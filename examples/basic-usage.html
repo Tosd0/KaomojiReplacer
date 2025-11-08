@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Emoticon Replacer - 基础使用示例</title>
+    <title>Kaomoji Replacer - 基础使用示例</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -94,13 +94,13 @@
     </style>
 </head>
 <body>
-    <h1>🎭 Emoticon Replacer - 基础使用示例</h1>
+    <h1>🎭 Kaomoji Replacer - 基础使用示例</h1>
 
     <div class="section">
         <h2>📝 文本替换演示</h2>
         <div class="input-area">
-            <label><strong>输入文本（包含 [emoticon:...] 标记）：</strong></label>
-            <textarea id="inputText">今天真是太[emoticon:无语,黑脸]了，不过还是很[emoticon:开心,高兴]的。虽然想[emoticon:掀桌,愤怒]，但还是决定[emoticon:躺平,摆烂]算了。</textarea>
+            <label><strong>输入文本（包含 [kaomoji:...] 标记）：</strong></label>
+            <textarea id="inputText">今天真是太[kaomoji:无语,黑脸]了，不过还是很[kaomoji:开心,高兴]的。虽然想[kaomoji:掀桌,愤怒]，但还是决定[kaomoji:躺平,摆烂]算了。</textarea>
             <div style="margin-top: 10px;">
                 <span class="example-text" onclick="loadExample1()">示例1</span> |
                 <span class="example-text" onclick="loadExample2()">示例2</span> |
@@ -140,8 +140,8 @@
     <script type="module">
         // 导入核心模块
         import SearchEngine from '../src/core/SearchEngine.js';
-        import EmoticonReplacer from '../src/core/EmoticonReplacer.js';
-        import EmoticonDataManager from '../src/core/EmoticonDataManager.js';
+        import KaomojiReplacer from '../src/core/KaomojiReplacer.js';
+        import KaomojiDataManager from '../src/core/KaomojiDataManager.js';
 
         // 初始化
         let replacer = null;
@@ -149,22 +149,22 @@
         async function init() {
             try {
                 // 创建数据管理器
-                const manager = new EmoticonDataManager();
+                const manager = new KaomojiDataManager();
 
                 // 从文件加载数据
-                const response = await fetch('../data/emoticons.template.json');
+                const response = await fetch('../data/kaomojis.template.json');
                 const jsonText = await response.text();
                 manager.loadFromJSON(jsonText);
 
                 // 创建搜索引擎和替换器
                 const searchEngine = new SearchEngine();
-                replacer = new EmoticonReplacer(searchEngine);
-                replacer.loadEmoticons(manager.getAllEmoticons());
+                replacer = new KaomojiReplacer(searchEngine);
+                replacer.loadKaomojis(manager.getAllKaomojis());
 
                 console.log('Initialized successfully');
                 const stats = manager.getStats();
                 document.getElementById('statsInfo').textContent =
-                    `已加载 ${stats.totalEmoticons} 个颜文字\n` +
+                    `已加载 ${stats.totalKaomojis} 个颜文字\n` +
                     `总关键词数量: ${stats.totalKeywords}\n`
             } catch (error) {
                 console.error('Initialization failed:', error);
@@ -208,7 +208,7 @@
                 output += `${index + 1}. 标记: ${item.marker}\n`;
                 output += `   关键词: ${item.keywords.join(', ')}\n`;
                 if (item.bestMatch) {
-                    output += `   最佳匹配: ${item.bestMatch.emoticon} (分数: ${item.bestMatch.score.toFixed(2)})\n`;
+                    output += `   最佳匹配: ${item.bestMatch.kaomoji} (分数: ${item.bestMatch.score.toFixed(2)})\n`;
                     output += `   匹配关键词: ${item.bestMatch.matchedKeywords.join(', ')}\n`;
                 } else {
                     output += `   ❌ 未找到匹配\n`;
@@ -267,7 +267,7 @@
             results.forEach((result, index) => {
                 html += `
                     <div class="result-item">
-                        <div style="font-size: 24px; margin-bottom: 5px;">${result.emoticon}</div>
+                        <div style="font-size: 24px; margin-bottom: 5px;">${result.kaomoji}</div>
                         <div><strong>分数:</strong> ${result.score.toFixed(2)}</div>
                         <div><strong>匹配关键词:</strong> ${result.matchedKeywords.join(', ')}</div>
                         <div><strong>分类:</strong> ${result.category}</div>
@@ -287,17 +287,17 @@
         // 示例文本
         function loadExample1() {
             document.getElementById('inputText').value =
-                '今天真是太[emoticon:无语,黑脸]了，不过还是很[emoticon:开心,高兴]的。虽然想[emoticon:掀桌,愤怒]，但还是决定[emoticon:躺平,摆烂]算了。';
+                '今天真是太[kaomoji:无语,黑脸]了，不过还是很[kaomoji:开心,高兴]的。虽然想[kaomoji:掀桌,愤怒]，但还是决定[kaomoji:躺平,摆烂]算了。';
         }
 
         function loadExample2() {
             document.getElementById('inputText').value =
-                '面对这个问题我表示[emoticon:疑惑,不解]，需要[emoticon:认真,严肃]思考一下。结果让我很[emoticon:惊讶,震惊]！';
+                '面对这个问题我表示[kaomoji:疑惑,不解]，需要[kaomoji:认真,严肃]思考一下。结果让我很[kaomoji:惊讶,震惊]！';
         }
 
         function loadExample3() {
             document.getElementById('inputText').value =
-                '看到他的回复，我只感觉[emoticon:鄙视,不屑]。但还是有点[emoticon:难过,伤心]。';
+                '看到他的回复，我只感觉[kaomoji:鄙视,不屑]。但还是有点[kaomoji:难过,伤心]。';
         }
 
         // 页面加载时初始化

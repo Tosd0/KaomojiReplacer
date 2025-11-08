@@ -1,4 +1,4 @@
-# Emoticon Replacer
+# Kaomoji Replacer
 
 基于 BM25 算法的智能颜文字替换工具，支持将文本中的关键词标记替换为对应的颜文字。可集成SillyTavern（酒馆）&小手机，节省颜文字世界书的Token，并提供更大量的颜文字选择区间。
 
@@ -15,23 +15,23 @@
 ### 安装
 
 ```bash
-npm install emoticon-replacer
+npm install kaomoji-replacer
 ```
 
 或直接克隆仓库使用：
 
 ```bash
-git clone https://github.com/Tosd0/EmoticonReplacer.git
+git clone https://github.com/Tosd0/KaomojiReplacer.git
 ```
 
 ### 数据格式
 
-在 `data/emoticons.template.json` 中定义颜文字映射：
+在 `data/kaomojis.template.json` 中定义颜文字映射：
 
 ```json
 [
   {
-    "emoticon": "= =",
+    "kaomoji": "= =",
     "keywords": ["无语", "黑脸", "无奈"],
     "weight": 1.0,
     "category": ""
@@ -43,23 +43,23 @@ git clone https://github.com/Tosd0/EmoticonReplacer.git
 
 #### 方式 0: UMD + CDN + IndexedDB（推荐，浏览器环境最简单）
 
-无需安装，只需引入一个 UMD 文件，使用 `initEmoticonStorage` 自动从 CDN 加载并缓存：
+无需安装，只需引入一个 UMD 文件，使用 `initKaomojiStorage` 自动从 CDN 加载并缓存：
 
 ```html
 <!-- 引入 UMD 文件 -->
-<script src="https://cdn.jsdelivr.net/npm/emoticon-replacer/dist/emoticon-replacer.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/kaomoji-replacer/dist/kaomoji-replacer.umd.min.js"></script>
 
 <script>
 // 从 CDN 加载默认模板（首次从 CDN 加载，之后从 IndexedDB 缓存读取）
-const emoticons = await EmoticonReplacer.initEmoticonStorage({
-    defaultURL: 'https://cdn.jsdelivr.net/npm/emoticon-replacer/data/emoticons.template.json'
+const kaomojis = await KaomojiReplacer.initKaomojiStorage({
+    defaultURL: 'https://cdn.jsdelivr.net/npm/kaomoji-replacer/data/kaomojis.template.json'
 });
 
 // 创建替换器
-const replacer = EmoticonReplacer.createReplacer({ emoticons });
+const replacer = KaomojiReplacer.createReplacer({ kaomojis });
 
 // 使用
-const result = replacer.replaceText('今天很[emoticon:开心,高兴]');
+const result = replacer.replaceText('今天很[kaomoji:开心,高兴]');
 console.log(result.text); // 输出: 今天很ヽ(´▽`)/
 </script>
 ```
@@ -75,50 +75,50 @@ console.log(result.text); // 输出: 今天很ヽ(´▽`)/
 #### 方式 1: 快捷 API（推荐，Node.js 环境最简单）
 
 ```javascript
-import { quickReplace, loadFromFile } from 'emoticon-replacer';
+import { quickReplace, loadFromFile } from 'kaomoji-replacer';
 
 // 从文件加载数据
-const emoticons = await loadFromFile('./data/emoticons.template.json');
+const kaomojis = await loadFromFile('./data/kaomojis.template.json');
 
 // 一行代码完成替换
-const result = quickReplace('今天真是[emoticon:无语,黑脸]', emoticons);
+const result = quickReplace('今天真是[kaomoji:无语,黑脸]', kaomojis);
 console.log(result.text); // 输出: 今天真是 = =
 ```
 
 #### 方式 2: 工厂函数（推荐，灵活配置）
 
 ```javascript
-import { createReplacer, loadFromFile } from 'emoticon-replacer';
+import { createReplacer, loadFromFile } from 'kaomoji-replacer';
 
 // 加载数据
-const emoticons = await loadFromFile('./data/emoticons.template.json');
+const kaomojis = await loadFromFile('./data/kaomojis.template.json');
 
 // 创建替换器实例（自动配置好所有组件）
-const replacer = createReplacer({ emoticons });
+const replacer = createReplacer({ kaomojis });
 
 // 使用替换器
-const result = replacer.replaceText('今天真是[emoticon:无语,黑脸]');
+const result = replacer.replaceText('今天真是[kaomoji:无语,黑脸]');
 console.log(result.text);
 ```
 
 #### 方式 3: 直接使用类（最灵活）
 
 ```javascript
-import { EmoticonReplacer, SearchEngine, EmoticonDataManager } from 'emoticon-replacer';
+import { KaomojiReplacer, SearchEngine, KaomojiDataManager } from 'kaomoji-replacer';
 
 // 1. 创建数据管理器并加载数据
-const manager = new EmoticonDataManager();
-const response = await fetch('data/emoticons.template.json');
+const manager = new KaomojiDataManager();
+const response = await fetch('data/kaomojis.template.json');
 const jsonText = await response.text();
 manager.loadFromJSON(jsonText);
 
 // 2. 初始化搜索引擎和替换器
 const searchEngine = new SearchEngine();
-const replacer = new EmoticonReplacer(searchEngine);
-replacer.loadEmoticons(manager.getAllEmoticons());
+const replacer = new KaomojiReplacer(searchEngine);
+replacer.loadKaomojis(manager.getAllKaomojis());
 
 // 3. 替换文本
-const input = '今天真是[emoticon:无语,黑脸]';
+const input = '今天真是[kaomoji:无语,黑脸]';
 const result = replacer.replaceText(input);
 console.log(result.text); // 输出: 今天真是 = =
 
@@ -133,18 +133,18 @@ const filtered = manager.filterByCategory('表情'); // 按分类筛选
 适合前端项目，自动管理数据持久化：
 
 ```javascript
-import { initEmoticonStorage, quickReplace } from 'emoticon-replacer';
+import { initKaomojiStorage, quickReplace } from 'kaomoji-replacer';
 
 // 初始化存储（首次自动从远程加载，之后使用缓存）
-const emoticons = await initEmoticonStorage({
-  defaultURL: 'https://your-cdn.com/emoticons.json'  // 可选
+const kaomojis = await initKaomojiStorage({
+  defaultURL: 'https://your-cdn.com/kaomojis.json'  // 可选
 });
 
 // 直接使用
-const result = quickReplace('今天[emoticon:开心]', emoticons);
+const result = quickReplace('今天[kaomoji:开心]', kaomojis);
 
 // 后续调用直接从 IndexedDB 读取（更快、离线可用）
-const cachedEmoticons = await initEmoticonStorage();
+const cachedKaomojis = await initKaomojiStorage();
 ```
 
 **特性：**
@@ -159,11 +159,11 @@ const cachedEmoticons = await initEmoticonStorage();
 
 ### 标记格式
 
-在文本中使用 `[emoticon:关键词1,关键词2,...]` 格式标记需要替换的位置：
+在文本中使用 `[kaomoji:关键词1,关键词2,...]` 格式标记需要替换的位置：
 
 ```
-今天很[emoticon:开心,高兴]  →  今天很 ヽ(´▽`)/
-真是[emoticon:无语]         →  真是 = =
+今天很[kaomoji:开心,高兴]  →  今天很 ヽ(´▽`)/
+真是[kaomoji:无语]         →  真是 = =
 ```
 
 ## SillyTavern 集成
@@ -172,7 +172,7 @@ const cachedEmoticons = await initEmoticonStorage();
 
 1. 将整个项目复制到 SillyTavern 扩展目录：
    ```
-   SillyTavern/public/scripts/extensions/emoticon-replacer/
+   SillyTavern/public/scripts/extensions/kaomoji-replacer/
    ```
 
 2. 在 `manifest.json` 中注册扩展（如需要）
@@ -181,7 +181,7 @@ const cachedEmoticons = await initEmoticonStorage();
 
 ### 使用说明
 
-扩展会自动处理包含 `[emoticon:...]` 标记的消息，支持两种模式：
+扩展会自动处理包含 `[kaomoji:...]` 标记的消息，支持两种模式：
 
 - **display 模式**: 仅修改显示内容，不影响 AI 上下文
 - **content 模式**: 直接修改消息内容，会影响 AI 上下文
@@ -189,15 +189,15 @@ const cachedEmoticons = await initEmoticonStorage();
 ## 项目结构
 
 ```
-EmoticonReplacer/
+KaomojiReplacer/
 ├── src/core/                    # 核心模块
 │   ├── SearchEngine.js          # BM25 搜索引擎
-│   ├── EmoticonReplacer.js      # 替换引擎
-│   └── EmoticonDataManager.js   # 数据管理器
+│   ├── KaomojiReplacer.js      # 替换引擎
+│   └── KaomojiDataManager.js   # 数据管理器
 ├── src/integrations/
 │   └── sillytavern.js           # SillyTavern 集成
 ├── data/
-│   └── emoticons.template.json  # 数据模板
+│   └── kaomojis.template.json  # 数据模板
 └── examples/                    # 使用示例
 ```
 
@@ -205,16 +205,16 @@ EmoticonReplacer/
 
 ### 快捷 API
 
-#### `quickReplace(text, emoticons, options)`
+#### `quickReplace(text, kaomojis, options)`
 
 一行代码完成文本替换：
 
 ```javascript
-import { quickReplace } from 'emoticon-replacer';
+import { quickReplace } from 'kaomoji-replacer';
 
 const result = quickReplace(
-  '今天[emoticon:开心,高兴]',
-  emoticons,
+  '今天[kaomoji:开心,高兴]',
+  kaomojis,
   {
     strategy: 'best',
     keepOriginalOnNotFound: true
@@ -225,30 +225,30 @@ console.log(result.text);
 console.log(result.successCount);
 ```
 
-#### `quickQuery(keywords, emoticons, topK)`
+#### `quickQuery(keywords, kaomojis, topK)`
 
 快速查询关键词对应的颜文字：
 
 ```javascript
-import { quickQuery } from 'emoticon-replacer';
+import { quickQuery } from 'kaomoji-replacer';
 
-const results = quickQuery('开心', emoticons, 5);
-console.log(results[0].emoticon);
+const results = quickQuery('开心', kaomojis, 5);
+console.log(results[0].kaomoji);
 ```
 
-#### `batchReplace(texts, emoticons, options)`
+#### `batchReplace(texts, kaomojis, options)`
 
 批量处理多个文本：
 
 ```javascript
-import { batchReplace } from 'emoticon-replacer';
+import { batchReplace } from 'kaomoji-replacer';
 
 const texts = [
-  '第一条[emoticon:开心]消息',
-  '第二条[emoticon:无语]消息'
+  '第一条[kaomoji:开心]消息',
+  '第二条[kaomoji:无语]消息'
 ];
 
-const results = batchReplace(texts, emoticons);
+const results = batchReplace(texts, kaomojis);
 results.forEach(r => console.log(r.text));
 ```
 
@@ -259,10 +259,10 @@ results.forEach(r => console.log(r.text));
 创建完整配置的替换器：
 
 ```javascript
-import { createReplacer } from 'emoticon-replacer';
+import { createReplacer } from 'kaomoji-replacer';
 
 const replacer = createReplacer({
-  emoticons: [...],           // 数据数组
+  kaomojis: [...],           // 数据数组
   searchConfig: {             // BM25 参数
     k1: 1.5,
     b: 0.75
@@ -278,7 +278,7 @@ const replacer = createReplacer({
 创建数据管理器：
 
 ```javascript
-import { createManager } from 'emoticon-replacer';
+import { createManager } from 'kaomoji-replacer';
 
 // 从数组创建
 const manager = createManager([...]);
@@ -289,13 +289,13 @@ const manager2 = createManager(jsonString);
 
 ### 核心类 API
 
-#### EmoticonReplacer
+#### KaomojiReplacer
 
 ```javascript
-import { EmoticonReplacer, SearchEngine } from 'emoticon-replacer';
+import { KaomojiReplacer, SearchEngine } from 'kaomoji-replacer';
 
 const engine = new SearchEngine();
-const replacer = new EmoticonReplacer(engine);
+const replacer = new KaomojiReplacer(engine);
 
 // 替换文本
 replacer.replaceText(text, {
@@ -315,7 +315,7 @@ replacer.exactQuery('开心');
 #### SearchEngine
 
 ```javascript
-import { SearchEngine } from 'emoticon-replacer';
+import { SearchEngine } from 'kaomoji-replacer';
 
 // 创建搜索引擎
 const engine = new SearchEngine({
@@ -324,7 +324,7 @@ const engine = new SearchEngine({
 });
 
 // 构建索引
-engine.buildIndex(emoticons);
+engine.buildIndex(kaomojis);
 
 // BM25 搜索
 engine.search('文本', topK, threshold);
@@ -333,19 +333,19 @@ engine.search('文本', topK, threshold);
 engine.exactMatch('文本');
 ```
 
-#### EmoticonDataManager
+#### KaomojiDataManager
 
 ```javascript
-import { EmoticonDataManager } from 'emoticon-replacer';
+import { KaomojiDataManager } from 'kaomoji-replacer';
 
 // 数据加载
-const manager = new EmoticonDataManager();
+const manager = new KaomojiDataManager();
 manager.loadFromJSON(jsonString);
 manager.loadFromArray(dataArray);
 
 // 读取操作
-manager.getAllEmoticons();                    // 获取所有颜文字
-manager.getKeywordsByEmoticon('= =');        // 获取特定颜文字的关键词
+manager.getAllKaomojis();                    // 获取所有颜文字
+manager.getKeywordsByKaomoji('= =');        // 获取特定颜文字的关键词
 manager.getAllKeywords();                    // 获取所有关键词列表
 manager.filterByCategory('表情');            // 按分类筛选
 manager.findByKeyword('开心');               // 按关键词查找
@@ -358,13 +358,13 @@ manager.setCategory('= =', '表情');         // 设置分类
 manager.setWeight('= =', 1.5);              // 设置权重
 
 // 颜文字管理
-manager.addEmoticon({                        // 添加新颜文字
-  emoticon: '(๑•̀ㅂ•́)و✧',
+manager.addKaomoji({                        // 添加新颜文字
+  kaomoji: '(๑•̀ㅂ•́)و✧',
   keywords: ['加油', '努力'],
   weight: 1.0,
   category: '鼓励'
 });
-manager.removeEmoticon('= =');               // 删除颜文字
+manager.removeKaomoji('= =');               // 删除颜文字
 
 // 数据导出
 const json = manager.exportToJSON();         // 导出为 JSON
@@ -374,13 +374,13 @@ const array = manager.exportToArray();       // 导出为数组
 ### 数据加载与工具
 
 ```javascript
-import { loadFromFile, loadFromURL, validateData } from 'emoticon-replacer';
+import { loadFromFile, loadFromURL, validateData } from 'kaomoji-replacer';
 
 // Node.js 环境：从文件加载
-const emoticons = await loadFromFile('./data/emoticons.json');
+const kaomojis = await loadFromFile('./data/kaomojis.json');
 
 // 浏览器环境：从 URL 加载
-const emoticons = await loadFromURL('/data/emoticons.json');
+const kaomojis = await loadFromURL('/data/kaomojis.json');
 
 // 验证数据格式
 const result = validateData(data);
@@ -392,27 +392,27 @@ const result = validateData(data);
 
 ```javascript
 import {
-  initEmoticonStorage,
-  getEmoticons,
-  saveEmoticons,
-  clearEmoticons,
+  initKaomojiStorage,
+  getKaomojis,
+  saveKaomojis,
+  clearKaomojis,
   getStorageStats
-} from 'emoticon-replacer';
+} from 'kaomoji-replacer';
 
 // 初始化存储（自动管理加载和缓存）
-const emoticons = await initEmoticonStorage({
-  defaultURL: 'https://cdn.example.com/emoticons.json',  // 可选
+const kaomojis = await initKaomojiStorage({
+  defaultURL: 'https://cdn.example.com/kaomojis.json',  // 可选
   forceReload: false  // 可选：是否强制重新加载
 });
 
 // 手动读取
-const data = await getEmoticons();  // 返回 Array 或 null
+const data = await getKaomojis();  // 返回 Array 或 null
 
 // 手动保存
-await saveEmoticons([...]);  // 保存自定义数据
+await saveKaomojis([...]);  // 保存自定义数据
 
 // 清空缓存
-await clearEmoticons();
+await clearKaomojis();
 
 // 获取统计信息
 const stats = await getStorageStats();

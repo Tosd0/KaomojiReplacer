@@ -16,9 +16,9 @@ import {
     createSearchEngine,
 
     // 核心类
-    EmoticonReplacer,
+    KaomojiReplacer,
     SearchEngine,
-    EmoticonDataManager,
+    KaomojiDataManager,
 
     // 工具函数
     validateData,
@@ -30,27 +30,27 @@ import {
 } from '../index.js';
 
 // 测试数据
-const testEmoticons = [
+const testKaomojis = [
     {
-        emoticon: "= =",
+        kaomoji: "= =",
         keywords: ["无语", "黑脸", "无奈", "翻白眼"],
         weight: 1.0,
         category: "表情"
     },
     {
-        emoticon: "(╯°□°）╯︵ ┻━┻",
+        kaomoji: "(╯°□°）╯︵ ┻━┻",
         keywords: ["掀桌", "愤怒", "生气", "暴躁"],
         weight: 1.0,
         category: "动作"
     },
     {
-        emoticon: "ヽ(´▽`)/",
+        kaomoji: "ヽ(´▽`)/",
         keywords: ["开心", "高兴", "快乐", "兴奋"],
         weight: 1.0,
         category: "表情"
     },
     {
-        emoticon: "_(:3」∠)_",
+        kaomoji: "_(:3」∠)_",
         keywords: ["躺平", "摆烂", "咸鱼", "懒"],
         weight: 1.0,
         category: "动作"
@@ -82,18 +82,18 @@ function demo(title, fn) {
     console.log();
 }
 
-console.log('\n🚀 Emoticon Replacer API 使用示例\n');
+console.log('\n🚀 Kaomoji Replacer API 使用示例\n');
 log(`版本: ${VERSION}`, 'yellow');
 log(`策略: ${Object.values(REPLACE_STRATEGIES).join(', ')}`, 'yellow');
 
 // ========== 演示 1: 快捷 API - quickReplace ==========
 demo('演示 1: 快捷 API - quickReplace', () => {
-    const text = '今天遇到 bug 真是[emoticon:无语,黑脸]，想要[emoticon:掀桌,愤怒]！';
+    const text = '今天遇到 bug 真是[kaomoji:无语,黑脸]，想要[kaomoji:掀桌,愤怒]！';
 
     log('输入文本:', 'blue');
     console.log(text);
 
-    const result = quickReplace(text, testEmoticons);
+    const result = quickReplace(text, testKaomojis);
 
     log('\n输出文本:', 'blue');
     console.log(result.text);
@@ -109,26 +109,26 @@ demo('演示 2: 快捷 API - quickQuery', () => {
 
     log(`查询关键词: ${keywords}`, 'blue');
 
-    const results = quickQuery(keywords, testEmoticons, 3);
+    const results = quickQuery(keywords, testKaomojis, 3);
 
     log('\n匹配结果:', 'blue');
     results.forEach((r, i) => {
-        console.log(`${i + 1}. ${r.emoticon} (分数: ${r.score.toFixed(2)}, 匹配: ${r.matchedKeywords.join(', ')})`);
+        console.log(`${i + 1}. ${r.kaomoji} (分数: ${r.score.toFixed(2)}, 匹配: ${r.matchedKeywords.join(', ')})`);
     });
 });
 
 // ========== 演示 3: 批量替换 ==========
 demo('演示 3: 批量替换 - batchReplace', () => {
     const texts = [
-        '第一条[emoticon:开心,高兴]消息',
-        '第二条[emoticon:无语]消息',
-        '第三条[emoticon:掀桌,愤怒]消息'
+        '第一条[kaomoji:开心,高兴]消息',
+        '第二条[kaomoji:无语]消息',
+        '第三条[kaomoji:掀桌,愤怒]消息'
     ];
 
     log('输入文本列表:', 'blue');
     texts.forEach((t, i) => console.log(`${i + 1}. ${t}`));
 
-    const results = batchReplace(texts, testEmoticons);
+    const results = batchReplace(texts, testKaomojis);
 
     log('\n输出文本列表:', 'blue');
     results.forEach((r, i) => console.log(`${i + 1}. ${r.text}`));
@@ -137,12 +137,12 @@ demo('演示 3: 批量替换 - batchReplace', () => {
 // ========== 演示 4: 工厂函数 - createReplacer ==========
 demo('演示 4: 工厂函数 - createReplacer', () => {
     const replacer = createReplacer({
-        emoticons: testEmoticons,
+        kaomojis: testKaomojis,
         searchConfig: { k1: 1.5, b: 0.75 },
         replaceConfig: { replaceStrategy: 'best' }
     });
 
-    const text = '今天[emoticon:开心]完成了任务';
+    const text = '今天[kaomoji:开心]完成了任务';
     const result = replacer.replaceText(text);
 
     log('使用工厂函数创建的替换器:', 'blue');
@@ -153,35 +153,35 @@ demo('演示 4: 工厂函数 - createReplacer', () => {
 // ========== 演示 5: 工厂函数 - createManager ==========
 demo('演示 5: 工厂函数 - createManager', () => {
     // 从数组创建
-    const manager = createManager(testEmoticons);
+    const manager = createManager(testKaomojis);
 
     log('从数组创建管理器:', 'blue');
-    console.log(`总计颜文字: ${manager.getAllEmoticons().length}`);
+    console.log(`总计颜文字: ${manager.getAllKaomojis().length}`);
     console.log(`总计关键词: ${manager.getAllKeywords().length}`);
     console.log(`分类列表: ${manager.getAllCategories().join(', ')}`);
 
     // 添加新颜文字
-    manager.addEmoticon({
-        emoticon: '(๑•̀ㅂ•́)و✧',
+    manager.addKaomoji({
+        kaomoji: '(๑•̀ㅂ•́)و✧',
         keywords: ['加油', '努力'],
         weight: 1.5,
         category: '鼓励'
     });
 
     log('\n添加新颜文字后:', 'blue');
-    console.log(`总计颜文字: ${manager.getAllEmoticons().length}`);
+    console.log(`总计颜文字: ${manager.getAllKaomojis().length}`);
 });
 
 // ========== 演示 6: 核心类使用 ==========
 demo('演示 6: 核心类直接使用', () => {
-    const manager = new EmoticonDataManager();
-    manager.loadFromArray(testEmoticons);
+    const manager = new KaomojiDataManager();
+    manager.loadFromArray(testKaomojis);
 
     const searchEngine = new SearchEngine({ k1: 1.5, b: 0.75 });
-    const replacer = new EmoticonReplacer(searchEngine);
-    replacer.loadEmoticons(manager.getAllEmoticons());
+    const replacer = new KaomojiReplacer(searchEngine);
+    replacer.loadKaomojis(manager.getAllKaomojis());
 
-    const text = '调试了半天，最后[emoticon:开心,高兴]解决了！';
+    const text = '调试了半天，最后[kaomoji:开心,高兴]解决了！';
     const result = replacer.replaceText(text);
 
     log('使用核心类:', 'blue');
@@ -191,9 +191,9 @@ demo('演示 6: 核心类直接使用', () => {
 
 // ========== 演示 7: 预览功能 ==========
 demo('演示 7: 预览功能', () => {
-    const replacer = createReplacer({ emoticons: testEmoticons });
+    const replacer = createReplacer({ kaomojis: testKaomojis });
 
-    const text = '今天[emoticon:开心,高兴]又[emoticon:躺平,摆烂]了';
+    const text = '今天[kaomoji:开心,高兴]又[kaomoji:躺平,摆烂]了';
     const preview = replacer.preview(text);
 
     log('预览替换结果（不实际替换）:', 'blue');
@@ -202,7 +202,7 @@ demo('演示 7: 预览功能', () => {
     preview.forEach((p, i) => {
         console.log(`标记 ${i + 1}: ${p.marker}`);
         console.log(`  关键词: ${p.keywords.join(', ')}`);
-        console.log(`  最佳匹配: ${p.bestMatch?.emoticon || 'N/A'}`);
+        console.log(`  最佳匹配: ${p.bestMatch?.kaomoji || 'N/A'}`);
         console.log(`  分数: ${p.bestMatch?.score.toFixed(2) || 'N/A'}`);
     });
 });
@@ -210,13 +210,13 @@ demo('演示 7: 预览功能', () => {
 // ========== 演示 8: 数据验证 ==========
 demo('演示 8: 数据验证 - validateData', () => {
     const validData = [
-        { emoticon: '😊', keywords: ['笑', '开心'], weight: 1.0, category: '' }
+        { kaomoji: '😊', keywords: ['笑', '开心'], weight: 1.0, category: '' }
     ];
 
     const invalidData = [
-        { emoticon: '😊' }, // 缺少 keywords
-        { keywords: ['test'] }, // 缺少 emoticon
-        { emoticon: '😊', keywords: ['valid'] } // 有效
+        { kaomoji: '😊' }, // 缺少 keywords
+        { keywords: ['test'] }, // 缺少 kaomoji
+        { kaomoji: '😊', keywords: ['valid'] } // 有效
     ];
 
     log('验证有效数据:', 'blue');
@@ -234,13 +234,13 @@ demo('演示 8: 数据验证 - validateData', () => {
 
 // ========== 演示 9: 数据管理 CRUD ==========
 demo('演示 9: 数据管理 - CRUD 操作', () => {
-    const manager = createManager(testEmoticons);
+    const manager = createManager(testKaomojis);
 
     log('原始数据:', 'blue');
-    const emoticon = manager.getEmoticonByText('= =');
-    console.log(`颜文字: ${emoticon.emoticon}`);
-    console.log(`关键词: ${emoticon.keywords.join(', ')}`);
-    console.log(`分类: ${emoticon.category || '(无)'}`);
+    const kaomoji = manager.getKaomojiByText('= =');
+    console.log(`颜文字: ${kaomoji.kaomoji}`);
+    console.log(`关键词: ${kaomoji.keywords.join(', ')}`);
+    console.log(`分类: ${kaomoji.category || '(无)'}`);
 
     // 添加关键词
     manager.addKeyword('= =', '不爽');
@@ -249,8 +249,8 @@ demo('演示 9: 数据管理 - CRUD 操作', () => {
     manager.setCategory('= =', '负面情绪');
 
     log('\n修改后:', 'blue');
-    const updated = manager.getEmoticonByText('= =');
-    console.log(`颜文字: ${updated.emoticon}`);
+    const updated = manager.getKaomojiByText('= =');
+    console.log(`颜文字: ${updated.kaomoji}`);
     console.log(`关键词: ${updated.keywords.join(', ')}`);
     console.log(`分类: ${updated.category}`);
 
@@ -262,9 +262,9 @@ demo('演示 9: 数据管理 - CRUD 操作', () => {
 
 // ========== 演示 10: 不同替换策略 ==========
 demo('演示 10: 不同替换策略', () => {
-    const replacer = createReplacer({ emoticons: testEmoticons });
+    const replacer = createReplacer({ kaomojis: testKaomojis });
 
-    const text = '今天[emoticon:开心,高兴,快乐]';
+    const text = '今天[kaomoji:开心,高兴,快乐]';
 
     log('文本:', 'blue');
     console.log(text);
@@ -285,13 +285,13 @@ demo('演示 10: 不同替换策略', () => {
 // ========== 演示 11: 从文件加载（异步） ==========
 demo('演示 11: 从文件加载数据', async () => {
     try {
-        log('从 data/emoticons.template.json 加载...', 'blue');
-        const emoticons = await loadFromFile('./data/emoticons.template.json');
+        log('从 data/kaomojis.template.json 加载...', 'blue');
+        const kaomojis = await loadFromFile('./data/kaomojis.template.json');
 
-        console.log(`✓ 成功加载 ${emoticons.length} 个颜文字`);
+        console.log(`✓ 成功加载 ${kaomojis.length} 个颜文字`);
 
         // 使用加载的数据
-        const result = quickReplace('测试[emoticon:无语]文本', emoticons);
+        const result = quickReplace('测试[kaomoji:无语]文本', kaomojis);
         log('\n测试替换:', 'blue');
         console.log(result.text);
     } catch (error) {
@@ -301,7 +301,7 @@ demo('演示 11: 从文件加载数据', async () => {
 
 // ========== 演示 12: 数据导出 ==========
 demo('演示 12: 数据导出', () => {
-    const manager = createManager(testEmoticons);
+    const manager = createManager(testKaomojis);
 
     // 添加一些修改
     manager.addKeyword('= =', '不开心');

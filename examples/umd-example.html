@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Emoticon Replacer - UMD Example</title>
+    <title>Kaomoji Replacer - UMD Example</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -57,13 +57,13 @@
     </style>
 </head>
 <body>
-    <h1>Emoticon Replacer - UMD 使用示例</h1>
+    <h1>Kaomoji Replacer - UMD 使用示例</h1>
 
     <div class="info">
         <strong>✨ 特点：</strong>
         <ul>
             <li><span class="highlight">只需引入一个 UMD 文件</span></li>
-            <li>使用 <code>initEmoticonStorage</code> 从 <span class="highlight">CDN 自动加载模板</span></li>
+            <li>使用 <code>initKaomojiStorage</code> 从 <span class="highlight">CDN 自动加载模板</span></li>
             <li><span class="highlight">首次从 CDN 加载，之后从 IndexedDB 缓存读取</span>（离线可用）</li>
             <li>支持 jsDelivr 和 unpkg 两种 CDN</li>
         </ul>
@@ -72,27 +72,27 @@
     <div class="demo">
         <h2>引入方式</h2>
         <p><strong>方式 1: 使用 CDN (jsDelivr)</strong></p>
-        <pre><code>&lt;script src="https://cdn.jsdelivr.net/npm/emoticon-replacer@latest/dist/emoticon-replacer.umd.min.js"&gt;&lt;/script&gt;</code></pre>
+        <pre><code>&lt;script src="https://cdn.jsdelivr.net/npm/kaomoji-replacer@latest/dist/kaomoji-replacer.umd.min.js"&gt;&lt;/script&gt;</code></pre>
 
         <p><strong>方式 2: 使用 CDN (unpkg)</strong></p>
-        <pre><code>&lt;script src="https://unpkg.com/emoticon-replacer@latest/dist/emoticon-replacer.umd.min.js"&gt;&lt;/script&gt;</code></pre>
+        <pre><code>&lt;script src="https://unpkg.com/kaomoji-replacer@latest/dist/kaomoji-replacer.umd.min.js"&gt;&lt;/script&gt;</code></pre>
 
         <p><strong>方式 3: 本地引用</strong></p>
-        <pre><code>&lt;script src="../dist/emoticon-replacer.umd.min.js"&gt;&lt;/script&gt;</code></pre>
+        <pre><code>&lt;script src="../dist/kaomoji-replacer.umd.min.js"&gt;&lt;/script&gt;</code></pre>
     </div>
 
     <div class="demo">
         <h2>使用方法</h2>
         <pre><code>// 从 CDN 加载默认模板（首次从 CDN 加载，之后从 IndexedDB 读取）
-const emoticons = await EmoticonReplacer.initEmoticonStorage({
-    defaultURL: 'https://cdn.jsdelivr.net/npm/emoticon-replacer/data/emoticons.template.json'
+const kaomojis = await KaomojiReplacer.initKaomojiStorage({
+    defaultURL: 'https://cdn.jsdelivr.net/npm/kaomoji-replacer/data/kaomojis.template.json'
 });
 
 // 创建替换器
-const replacer = EmoticonReplacer.createReplacer({ emoticons });
+const replacer = KaomojiReplacer.createReplacer({ kaomojis });
 
 // 使用
-const result = replacer.replaceText('今天很[emoticon:开心]');
+const result = replacer.replaceText('今天很[kaomoji:开心]');
 console.log(result.text);  // 输出: 今天很ヽ(´▽`)/ (或其他匹配的颜文字)</code></pre>
     </div>
 
@@ -108,13 +108,13 @@ console.log(result.text);  // 输出: 今天很ヽ(´▽`)/ (或其他匹配的�
     </div>
 
     <div class="demo">
-        <textarea id="input" placeholder="输入文本，如：这个真的很[emoticon:开心]呢！">今天真是太[emoticon:无语,黑脸]了，不过还是很[emoticon:开心,高兴]的。虽然想[emoticon:掀桌,愤怒]，但还是决定[emoticon:躺平,摆烂]算了。</textarea>
+        <textarea id="input" placeholder="输入文本，如：这个真的很[kaomoji:开心]呢！">今天真是太[kaomoji:无语,黑脸]了，不过还是很[kaomoji:开心,高兴]的。虽然想[kaomoji:掀桌,愤怒]，但还是决定[kaomoji:躺平,摆烂]算了。</textarea>
         <button onclick="processText()">替换颜文字</button>
         <div class="result" id="output">请先初始化...</div>
     </div>
 
     <!-- 本地引用示例，实际使用时替换为 CDN -->
-    <script src="../dist/emoticon-replacer.umd.min.js"></script>
+    <script src="../dist/kaomoji-replacer.umd.min.js"></script>
 
     <script>
         let replacer = null;
@@ -123,27 +123,27 @@ console.log(result.text);  // 输出: 今天很ヽ(´▽`)/ (或其他匹配的�
         async function initWithCDN(cdn = 'jsdelivr') {
             try {
                 const cdnURL = cdn === 'unpkg'
-                    ? 'https://unpkg.com/emoticon-replacer/data/emoticons.template.json'
-                    : 'https://cdn.jsdelivr.net/npm/emoticon-replacer/data/emoticons.template.json';
+                    ? 'https://unpkg.com/kaomoji-replacer/data/kaomojis.template.json'
+                    : 'https://cdn.jsdelivr.net/npm/kaomoji-replacer/data/kaomojis.template.json';
 
                 document.getElementById('status').innerHTML = `正在从 ${cdn} CDN 加载...`;
 
-                // 使用 initEmoticonStorage 自动管理缓存
-                const emoticons = await EmoticonReplacer.initEmoticonStorage({
+                // 使用 initKaomojiStorage 自动管理缓存
+                const kaomojis = await KaomojiReplacer.initKaomojiStorage({
                     defaultURL: cdnURL
                 });
 
                 // 创建替换器
-                replacer = EmoticonReplacer.createReplacer({ emoticons });
+                replacer = KaomojiReplacer.createReplacer({ kaomojis });
 
                 document.getElementById('status').innerHTML = `
                     ✓ 初始化成功！<br>
                     CDN: ${cdn}<br>
-                    已加载 ${emoticons.length} 个颜文字<br>
+                    已加载 ${kaomojis.length} 个颜文字<br>
                     <small>（数据已缓存到 IndexedDB，下次访问将直接从缓存读取）</small>
                 `;
 
-                console.log('Emoticon Replacer initialized with', emoticons.length, 'emoticons');
+                console.log('Kaomoji Replacer initialized with', kaomojis.length, 'kaomojis');
             } catch (error) {
                 document.getElementById('status').innerHTML = `❌ 初始化失败: ${error.message}`;
                 console.error('Initialization error:', error);
@@ -171,7 +171,7 @@ console.log(result.text);  // 输出: 今天很ヽ(´▽`)/ (或其他匹配的�
 
         // 查看缓存状态
         async function showStorageStats() {
-            const stats = await EmoticonReplacer.getStorageStats();
+            const stats = await KaomojiReplacer.getStorageStats();
             document.getElementById('status').innerHTML = `
                 <strong>IndexedDB 缓存状态：</strong><br>
                 ${stats.hasData ? '✓ 有缓存' : '✗ 无缓存'}<br>
@@ -182,7 +182,7 @@ console.log(result.text);  // 输出: 今天很ヽ(´▽`)/ (或其他匹配的�
 
         // 清空缓存
         async function clearCache() {
-            const success = await EmoticonReplacer.clearEmoticons();
+            const success = await KaomojiReplacer.clearKaomojis();
             if (success) {
                 document.getElementById('status').innerHTML = '✓ 缓存已清空！下次初始化将重新从 CDN 加载。';
                 replacer = null;
@@ -192,8 +192,8 @@ console.log(result.text);  // 输出: 今天很ヽ(´▽`)/ (或其他匹配的�
         }
 
         // 页面加载时输出版本信息
-        console.log('Emoticon Replacer Version:', window.EmoticonReplacer.VERSION);
-        console.log('Available APIs:', Object.keys(window.EmoticonReplacer));
+        console.log('Kaomoji Replacer Version:', window.KaomojiReplacer.VERSION);
+        console.log('Available APIs:', Object.keys(window.KaomojiReplacer));
     </script>
 </body>
 </html>

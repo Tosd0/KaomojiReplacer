@@ -11,18 +11,18 @@ class SearchEngine {
         this.b = config.b || 0.75;   // 长度归一化参数
 
         // 索引数据
-        this.documents = [];         // 文档列表（每个emoticon的keywords作为一个文档）
+        this.documents = [];         // 文档列表（每个kaomoji的keywords作为一个文档）
         this.avgDocLength = 0;       // 平均文档长度
         this.idf = new Map();        // IDF 值缓存
     }
 
     /**
      * 构建索引
-     * @param {Array} emoticons - emoticon 数据数组
+     * @param {Array} kaomojis - kaomoji 数据数组
      */
-    buildIndex(emoticons) {
-        this.documents = emoticons.map(item => ({
-            emoticon: item.emoticon,
+    buildIndex(kaomojis) {
+        this.documents = kaomojis.map(item => ({
+            kaomoji: item.kaomoji,
             keywords: [...item.keywords],
             weight: item.weight || 1.0,
             category: item.category || ''
@@ -89,7 +89,7 @@ class SearchEngine {
     }
 
     /**
-     * 搜索匹配的 emoticon
+     * 搜索匹配的 kaomoji
      * @param {string} text - 要搜索的文本
      * @param {number} topK - 返回前 K 个结果
      * @param {number} threshold - 最低分数阈值
@@ -112,7 +112,7 @@ class SearchEngine {
 
         // 计算每个文档的分数
         const results = this.documents.map(doc => ({
-            emoticon: doc.emoticon,
+            kaomoji: doc.kaomoji,
             score: this._calculateBM25(queryTerms, doc),
             matchedKeywords: doc.keywords.filter(k => queryTermsSet.has(k)),
             category: doc.category
@@ -171,7 +171,7 @@ class SearchEngine {
 
             if (matchedKeywords.length > 0) {
                 results.push({
-                    emoticon: doc.emoticon,
+                    kaomoji: doc.kaomoji,
                     matchedKeywords: matchedKeywords,
                     score: matchedKeywords.length * doc.weight,
                     category: doc.category

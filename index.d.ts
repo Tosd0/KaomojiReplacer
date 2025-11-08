@@ -4,8 +4,8 @@
 
 // ========== 数据类型 ==========
 
-export interface EmoticonData {
-    emoticon: string;
+export interface KaomojiData {
+    kaomoji: string;
     keywords: string[];
     weight?: number;
     category?: string;
@@ -30,7 +30,7 @@ export interface ReplaceOptions {
 }
 
 export interface SearchResult {
-    emoticon: string;
+    kaomoji: string;
     score: number;
     matchedKeywords: string[];
     category: string;
@@ -40,7 +40,7 @@ export interface Replacement {
     index: number;
     original: string;
     keywords: string[];
-    emoticon: string | null;
+    kaomoji: string | null;
     offset: number;
     matches: SearchResult[];
     selected: SearchResult | SearchResult[] | null;
@@ -65,14 +65,14 @@ export interface PreviewMarker {
 }
 
 export interface DataStats {
-    totalEmoticons: number;
+    totalKaomojis: number;
     totalKeywords: number;
     totalCategories: number;
-    averageKeywordsPerEmoticon: number;
+    averageKeywordsPerKaomoji: number;
 }
 
 export interface ReplacerStats {
-    totalEmoticons: number;
+    totalKaomojis: number;
     avgDocLength: number;
     config: ReplaceConfig;
 }
@@ -105,7 +105,7 @@ export class SearchEngine {
     k1: number;
     b: number;
     documents: Array<{
-        emoticon: string;
+        kaomoji: string;
         keywords: string[];
         weight: number;
         category: string;
@@ -116,7 +116,7 @@ export class SearchEngine {
     /**
      * 构建索引
      */
-    buildIndex(emoticons: EmoticonData[]): void;
+    buildIndex(kaomojis: KaomojiData[]): void;
 
     /**
      * BM25 搜索
@@ -130,9 +130,9 @@ export class SearchEngine {
 }
 
 /**
- * EmoticonReplacer - 颜文字替换引擎
+ * KaomojiReplacer - 颜文字替换引擎
  */
-export class EmoticonReplacer {
+export class KaomojiReplacer {
     constructor(searchEngine: SearchEngine);
 
     searchEngine: SearchEngine;
@@ -146,7 +146,7 @@ export class EmoticonReplacer {
     /**
      * 加载颜文字数据
      */
-    loadEmoticons(emoticons: EmoticonData[]): void;
+    loadKaomojis(kaomojis: KaomojiData[]): void;
 
     /**
      * 替换文本
@@ -180,67 +180,67 @@ export class EmoticonReplacer {
 }
 
 /**
- * EmoticonDataManager - 数据管理器
+ * KaomojiDataManager - 数据管理器
  */
-export class EmoticonDataManager {
+export class KaomojiDataManager {
     constructor();
 
-    emoticons: EmoticonData[];
+    kaomojis: KaomojiData[];
 
     // 数据加载
-    loadFromJSON(jsonString: string): EmoticonDataManager;
-    loadFromArray(data: EmoticonData[]): EmoticonDataManager;
+    loadFromJSON(jsonString: string): KaomojiDataManager;
+    loadFromArray(data: KaomojiData[]): KaomojiDataManager;
 
     // 读取操作
-    getAllEmoticons(): EmoticonData[];
-    getEmoticonByText(emoticon: string): EmoticonData | null;
+    getAllKaomojis(): KaomojiData[];
+    getKaomojiByText(kaomoji: string): KaomojiData | null;
     getAllKeywords(): string[];
-    getKeywordsByEmoticon(emoticon: string): string[];
-    filterByCategory(category: string | string[]): EmoticonData[];
+    getKeywordsByKaomoji(kaomoji: string): string[];
+    filterByCategory(category: string | string[]): KaomojiData[];
     getAllCategories(): string[];
-    findByKeyword(keyword: string): EmoticonData[];
+    findByKeyword(keyword: string): KaomojiData[];
     getStats(): DataStats;
 
     // 修改操作
-    addKeyword(emoticon: string, keyword: string): boolean;
-    removeKeyword(emoticon: string, keyword: string): boolean;
-    updateKeywords(emoticon: string, keywords: string[]): boolean;
-    setCategory(emoticon: string, category: string): boolean;
-    setWeight(emoticon: string, weight: number): boolean;
+    addKeyword(kaomoji: string, keyword: string): boolean;
+    removeKeyword(kaomoji: string, keyword: string): boolean;
+    updateKeywords(kaomoji: string, keywords: string[]): boolean;
+    setCategory(kaomoji: string, category: string): boolean;
+    setWeight(kaomoji: string, weight: number): boolean;
 
     // 颜文字管理
-    addEmoticon(data: Partial<EmoticonData> & { emoticon: string; keywords: string[] }): boolean;
-    removeEmoticon(emoticon: string): boolean;
-    updateEmoticon(emoticon: string, newData: Partial<EmoticonData> & { emoticon: string; keywords: string[] }): boolean;
+    addKaomoji(data: Partial<KaomojiData> & { kaomoji: string; keywords: string[] }): boolean;
+    removeKaomoji(kaomoji: string): boolean;
+    updateKaomoji(kaomoji: string, newData: Partial<KaomojiData> & { kaomoji: string; keywords: string[] }): boolean;
 
     // 数据导出
     exportToJSON(pretty?: boolean): string;
-    exportToArray(): EmoticonData[];
+    exportToArray(): KaomojiData[];
 
     // 批量操作
-    batchSetCategory(emoticons: string[], category: string): number;
-    batchRemove(emoticons: string[]): number;
+    batchSetCategory(kaomojis: string[], category: string): number;
+    batchRemove(kaomojis: string[]): number;
     clear(): void;
 }
 
 // ========== 工厂函数 ==========
 
 export interface CreateReplacerOptions {
-    emoticons?: EmoticonData[];
+    kaomojis?: KaomojiData[];
     jsonData?: string;
     searchConfig?: SearchConfig;
     replaceConfig?: ReplaceConfig;
 }
 
 /**
- * 创建 EmoticonReplacer 实例
+ * 创建 KaomojiReplacer 实例
  */
-export function createReplacer(options?: CreateReplacerOptions): EmoticonReplacer;
+export function createReplacer(options?: CreateReplacerOptions): KaomojiReplacer;
 
 /**
- * 创建 EmoticonDataManager 实例
+ * 创建 KaomojiDataManager 实例
  */
-export function createManager(data?: EmoticonData[] | string): EmoticonDataManager;
+export function createManager(data?: KaomojiData[] | string): KaomojiDataManager;
 
 /**
  * 创建 SearchEngine 实例
@@ -259,7 +259,7 @@ export interface QuickReplaceOptions extends ReplaceOptions {
  */
 export function quickReplace(
     text: string,
-    emoticons: EmoticonData[] | string,
+    kaomojis: KaomojiData[] | string,
     options?: QuickReplaceOptions
 ): ReplaceResult;
 
@@ -268,19 +268,19 @@ export function quickReplace(
  */
 export function quickQuery(
     keywords: string,
-    emoticons: EmoticonData[] | string,
+    kaomojis: KaomojiData[] | string,
     topK?: number
 ): SearchResult[];
 
 /**
  * 从文件加载数据 (Node.js only)
  */
-export function loadFromFile(filePath: string): Promise<EmoticonData[]>;
+export function loadFromFile(filePath: string): Promise<KaomojiData[]>;
 
 /**
  * 从 URL 加载数据 (Browser only)
  */
-export function loadFromURL(url: string): Promise<EmoticonData[]>;
+export function loadFromURL(url: string): Promise<KaomojiData[]>;
 
 // ========== 工具函数 ==========
 
@@ -294,7 +294,7 @@ export function validateData(data: any[]): ValidationResult;
  */
 export function batchReplace(
     texts: string[],
-    emoticons: EmoticonData[] | string,
+    kaomojis: KaomojiData[] | string,
     options?: QuickReplaceOptions
 ): ReplaceResult[];
 
@@ -306,22 +306,22 @@ export function batchReplace(
  * 如果没有，尝试从远程 URL 加载并保存
  * 远程加载失败则返回空数组
  */
-export function initEmoticonStorage(options?: InitStorageOptions): Promise<EmoticonData[]>;
+export function initKaomojiStorage(options?: InitStorageOptions): Promise<KaomojiData[]>;
 
 /**
  * 从 IndexedDB 读取颜文字数据
  */
-export function getEmoticons(): Promise<EmoticonData[] | null>;
+export function getKaomojis(): Promise<KaomojiData[] | null>;
 
 /**
  * 保存颜文字数据到 IndexedDB
  */
-export function saveEmoticons(data: EmoticonData[]): Promise<boolean>;
+export function saveKaomojis(data: KaomojiData[]): Promise<boolean>;
 
 /**
  * 清空 IndexedDB 中的颜文字数据
  */
-export function clearEmoticons(): Promise<boolean>;
+export function clearKaomojis(): Promise<boolean>;
 
 /**
  * 获取存储统计信息
@@ -350,11 +350,11 @@ export const REPLACE_STRATEGIES: {
 
 // ========== 默认导出 ==========
 
-export interface EmoticonReplacerAPI {
+export interface KaomojiReplacerAPI {
     // 核心类
-    EmoticonReplacer: typeof EmoticonReplacer;
+    KaomojiReplacer: typeof KaomojiReplacer;
     SearchEngine: typeof SearchEngine;
-    EmoticonDataManager: typeof EmoticonDataManager;
+    KaomojiDataManager: typeof KaomojiDataManager;
 
     // 工厂函数
     createReplacer: typeof createReplacer;
@@ -374,10 +374,10 @@ export interface EmoticonReplacerAPI {
     batchReplace: typeof batchReplace;
 
     // 存储 API
-    initEmoticonStorage: typeof initEmoticonStorage;
-    getEmoticons: typeof getEmoticons;
-    saveEmoticons: typeof saveEmoticons;
-    clearEmoticons: typeof clearEmoticons;
+    initKaomojiStorage: typeof initKaomojiStorage;
+    getKaomojis: typeof getKaomojis;
+    saveKaomojis: typeof saveKaomojis;
+    clearKaomojis: typeof clearKaomojis;
     getStorageStats: typeof getStorageStats;
     setDebugMode: typeof setDebugMode;
 
@@ -387,5 +387,5 @@ export interface EmoticonReplacerAPI {
     REPLACE_STRATEGIES: typeof REPLACE_STRATEGIES;
 }
 
-declare const api: EmoticonReplacerAPI;
+declare const api: KaomojiReplacerAPI;
 export default api;

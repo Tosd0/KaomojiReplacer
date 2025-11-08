@@ -1,16 +1,16 @@
 /**
- * Emoticon Replacer - Unified API Entry Point
+ * Kaomoji Replacer - Unified API Entry Point
  *
  * 提供多种导入和使用方式：
- * 1. 类导入：const { EmoticonReplacer, SearchEngine, EmoticonDataManager } = require('emoticon-replacer');
- * 2. 工厂函数：const { createReplacer, createManager } = require('emoticon-replacer');
- * 3. 快捷 API：const { quickReplace } = require('emoticon-replacer');
+ * 1. 类导入：const { KaomojiReplacer, SearchEngine, KaomojiDataManager } = require('kaomoji-replacer');
+ * 2. 工厂函数：const { createReplacer, createManager } = require('kaomoji-replacer');
+ * 3. 快捷 API：const { quickReplace } = require('kaomoji-replacer');
  */
 
 // 导入核心类
-import EmoticonReplacer from './src/core/EmoticonReplacer.js';
+import KaomojiReplacer from './src/core/KaomojiReplacer.js';
 import SearchEngine from './src/core/SearchEngine.js';
-import EmoticonDataManager from './src/core/EmoticonDataManager.js';
+import KaomojiDataManager from './src/core/KaomojiDataManager.js';
 
 // 导入存储模块
 import * as IndexedDBStorage from './src/storage/IndexedDBStorage.js';
@@ -18,17 +18,17 @@ import * as IndexedDBStorage from './src/storage/IndexedDBStorage.js';
 // ========== 工厂函数 ==========
 
 /**
- * 创建一个完整配置的 EmoticonReplacer 实例
+ * 创建一个完整配置的 KaomojiReplacer 实例
  * @param {Object} options - 配置选项
- * @param {Array} options.emoticons - 颜文字数据数组
+ * @param {Array} options.kaomojis - 颜文字数据数组
  * @param {string} options.jsonData - JSON 格式的颜文字数据
  * @param {Object} options.searchConfig - SearchEngine 配置 { k1, b }
- * @param {Object} options.replaceConfig - EmoticonReplacer 配置
- * @returns {EmoticonReplacer} 配置好的 EmoticonReplacer 实例
+ * @param {Object} options.replaceConfig - KaomojiReplacer 配置
+ * @returns {KaomojiReplacer} 配置好的 KaomojiReplacer 实例
  */
 function createReplacer(options = {}) {
     const {
-        emoticons = [],
+        kaomojis = [],
         jsonData = null,
         searchConfig = {},
         replaceConfig = {}
@@ -38,7 +38,7 @@ function createReplacer(options = {}) {
     const searchEngine = new SearchEngine(searchConfig);
 
     // 创建替换器
-    const replacer = new EmoticonReplacer(searchEngine);
+    const replacer = new KaomojiReplacer(searchEngine);
 
     // 应用配置
     if (replaceConfig) {
@@ -47,23 +47,23 @@ function createReplacer(options = {}) {
 
     // 加载数据
     if (jsonData) {
-        const manager = new EmoticonDataManager();
+        const manager = new KaomojiDataManager();
         manager.loadFromJSON(jsonData);
-        replacer.loadEmoticons(manager.getAllEmoticons());
-    } else if (emoticons.length > 0) {
-        replacer.loadEmoticons(emoticons);
+        replacer.loadKaomojis(manager.getAllKaomojis());
+    } else if (kaomojis.length > 0) {
+        replacer.loadKaomojis(kaomojis);
     }
 
     return replacer;
 }
 
 /**
- * 创建 EmoticonDataManager 实例并加载数据
+ * 创建 KaomojiDataManager 实例并加载数据
  * @param {Array|string} data - 颜文字数据数组或 JSON 字符串
- * @returns {EmoticonDataManager} 加载好数据的 EmoticonDataManager 实例
+ * @returns {KaomojiDataManager} 加载好数据的 KaomojiDataManager 实例
  */
 function createManager(data = null) {
-    const manager = new EmoticonDataManager();
+    const manager = new KaomojiDataManager();
 
     if (data) {
         if (typeof data === 'string') {
@@ -90,14 +90,14 @@ function createSearchEngine(config = {}) {
 /**
  * 快速替换文本（一站式 API）
  * @param {string} text - 要处理的文本
- * @param {Array|string} emoticons - 颜文字数据（数组或 JSON 字符串）
+ * @param {Array|string} kaomojis - 颜文字数据（数组或 JSON 字符串）
  * @param {Object} options - 替换选项
  * @returns {Object} 替换结果
  */
-function quickReplace(text, emoticons, options = {}) {
+function quickReplace(text, kaomojis, options = {}) {
     const replacer = createReplacer({
-        emoticons: Array.isArray(emoticons) ? emoticons : [],
-        jsonData: typeof emoticons === 'string' ? emoticons : null,
+        kaomojis: Array.isArray(kaomojis) ? kaomojis : [],
+        jsonData: typeof kaomojis === 'string' ? kaomojis : null,
         searchConfig: options.searchConfig,
         replaceConfig: options.replaceConfig
     });
@@ -108,14 +108,14 @@ function quickReplace(text, emoticons, options = {}) {
 /**
  * 快速查询关键词对应的颜文字
  * @param {string} keywords - 关键词
- * @param {Array|string} emoticons - 颜文字数据
+ * @param {Array|string} kaomojis - 颜文字数据
  * @param {number} topK - 返回前 K 个结果
  * @returns {Array} 匹配结果
  */
-function quickQuery(keywords, emoticons, topK = 5) {
+function quickQuery(keywords, kaomojis, topK = 5) {
     const replacer = createReplacer({
-        emoticons: Array.isArray(emoticons) ? emoticons : [],
-        jsonData: typeof emoticons === 'string' ? emoticons : null
+        kaomojis: Array.isArray(kaomojis) ? kaomojis : [],
+        jsonData: typeof kaomojis === 'string' ? kaomojis : null
     });
 
     return replacer.query(keywords, topK);
@@ -134,9 +134,9 @@ async function loadFromFile(filePath) {
 
     const { promises: fs } = await import('fs');
     const fileContent = await fs.readFile(filePath, 'utf8');
-    const manager = new EmoticonDataManager();
+    const manager = new KaomojiDataManager();
     manager.loadFromJSON(fileContent);
-    return manager.getAllEmoticons();
+    return manager.getAllKaomojis();
 }
 
 /**
@@ -152,9 +152,9 @@ async function loadFromURL(url) {
     }
 
     const jsonText = await response.text();
-    const manager = new EmoticonDataManager();
+    const manager = new KaomojiDataManager();
     manager.loadFromJSON(jsonText);
-    return manager.getAllEmoticons();
+    return manager.getAllKaomojis();
 }
 
 // ========== 工具函数 ==========
@@ -177,8 +177,8 @@ function validateData(data) {
             return;
         }
 
-        if (!item.emoticon || typeof item.emoticon !== 'string') {
-            errors.push(`Item ${index}: Missing or invalid 'emoticon' field`);
+        if (!item.kaomoji || typeof item.kaomoji !== 'string') {
+            errors.push(`Item ${index}: Missing or invalid 'kaomoji' field`);
         }
 
         if (!item.keywords || !Array.isArray(item.keywords) || item.keywords.length === 0) {
@@ -199,14 +199,14 @@ function validateData(data) {
 /**
  * 批量处理文本数组
  * @param {Array<string>} texts - 文本数组
- * @param {Array|string} emoticons - 颜文字数据
+ * @param {Array|string} kaomojis - 颜文字数据
  * @param {Object} options - 替换选项
  * @returns {Array} 处理结果数组
  */
-function batchReplace(texts, emoticons, options = {}) {
+function batchReplace(texts, kaomojis, options = {}) {
     const replacer = createReplacer({
-        emoticons: Array.isArray(emoticons) ? emoticons : [],
-        jsonData: typeof emoticons === 'string' ? emoticons : null,
+        kaomojis: Array.isArray(kaomojis) ? kaomojis : [],
+        jsonData: typeof kaomojis === 'string' ? kaomojis : null,
         searchConfig: options.searchConfig,
         replaceConfig: options.replaceConfig
     });
@@ -224,7 +224,7 @@ const DEFAULT_CONFIG = {
         b: 0.75
     },
     replace: {
-        markerPattern: /\[emoticon:([^\]]+)\]/gi,
+        markerPattern: /\[kaomoji:([^\]]+)\]/gi,
         keywordSeparator: ',',
         replaceStrategy: 'best'
     }
@@ -240,9 +240,9 @@ const REPLACE_STRATEGIES = {
 
 export {
     // 核心类
-    EmoticonReplacer,
+    KaomojiReplacer,
     SearchEngine,
-    EmoticonDataManager,
+    KaomojiDataManager,
 
     // 工厂函数
     createReplacer,
@@ -272,10 +272,10 @@ export {
 
 // 导出 IndexedDB 存储函数（解构便于使用）
 export const {
-    initEmoticonStorage,
-    getEmoticons,
-    saveEmoticons,
-    clearEmoticons,
+    initKaomojiStorage,
+    getKaomojis,
+    saveKaomojis,
+    clearKaomojis,
     getStorageStats,
     setDebugMode
 } = IndexedDBStorage;

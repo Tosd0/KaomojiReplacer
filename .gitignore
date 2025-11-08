@@ -19,8 +19,8 @@ yarn-debug.log*
 yarn-error.log*
 
 # User data
-data/emoticons.json
-!data/emoticons.template.json
+data/kaomojis.json
+!data/kaomojis.template.json
 
 # Build (keep dist/ for UMD bundles to be committed)
 build/

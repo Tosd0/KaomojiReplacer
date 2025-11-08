@@ -4,10 +4,10 @@
  * 用于在浏览器中持久化颜文字数据
  */
 
-const DB_NAME = 'EmoticonReplacerDB';
+const DB_NAME = 'KaomojiReplacerDB';
 const DB_VERSION = 1;
-const STORE_NAME = 'emoticons';
-const DATA_KEY = 'emoticon_data';
+const STORE_NAME = 'kaomojis';
+const DATA_KEY = 'kaomoji_data';
 
 // 调试开关（默认关闭）
 let DEBUG_MODE = false;
@@ -25,22 +25,22 @@ function setDebugMode(enabled) {
  */
 function debugLog(message, ...args) {
     if (DEBUG_MODE) {
-        console.log(`[EmoticonReplacer] ${message}`, ...args);
+        console.log(`[KaomojiReplacer] ${message}`, ...args);
     }
 }
 
 function debugWarn(message, ...args) {
     if (DEBUG_MODE) {
-        console.warn(`[EmoticonReplacer] ${message}`, ...args);
+        console.warn(`[KaomojiReplacer] ${message}`, ...args);
     }
 }
 
 function debugError(message, ...args) {
     // 错误总是输出，但在非调试模式下简化
     if (DEBUG_MODE) {
-        console.error(`[EmoticonReplacer] ${message}`, ...args);
+        console.error(`[KaomojiReplacer] ${message}`, ...args);
     } else {
-        console.error(`[EmoticonReplacer] ${message}`);
+        console.error(`[KaomojiReplacer] ${message}`);
     }
 }
 
@@ -80,7 +80,7 @@ function openDatabase() {
  * 从 IndexedDB 读取颜文字数据
  * @returns {Promise<Array|null>} 颜文字数组，不存在返回 null
  */
-async function getEmoticons() {
+async function getKaomojis() {
     try {
         const db = await openDatabase();
 
@@ -117,7 +117,7 @@ async function getEmoticons() {
  * @param {Array} data - 颜文字数组
  * @returns {Promise<boolean>} 是否成功
  */
-async function saveEmoticons(data) {
+async function saveKaomojis(data) {
     if (!Array.isArray(data)) {
         debugError('Data must be an array');
         return false;
@@ -133,7 +133,7 @@ async function saveEmoticons(data) {
 
             transaction.oncomplete = () => {
                 db.close();
-                debugLog(`Saved ${data.length} emoticons to IndexedDB`);
+                debugLog(`Saved ${data.length} kaomojis to IndexedDB`);
                 resolve(true);
             };
 
@@ -156,7 +156,7 @@ async function saveEmoticons(data) {
  * 清空 IndexedDB 中的颜文字数据
  * @returns {Promise<boolean>} 是否成功
  */
-async function clearEmoticons() {
+async function clearKaomojis() {
     try {
         const db = await openDatabase();
 
@@ -167,7 +167,7 @@ async function clearEmoticons() {
 
             transaction.oncomplete = () => {
                 db.close();
-                debugLog('Cleared emoticons from IndexedDB');
+                debugLog('Cleared kaomojis from IndexedDB');
                 resolve(true);
             };
 
@@ -225,7 +225,7 @@ async function loadFromRemote(url) {
  * @param {boolean} options.forceReload - 是否强制重新加载（忽略缓存）
  * @returns {Promise<Array>} 颜文字数组
  */
-async function initEmoticonStorage(options = {}) {
+async function initKaomojiStorage(options = {}) {
     const {
         defaultURL = null,
         forceReload = false
@@ -234,22 +234,22 @@ async function initEmoticonStorage(options = {}) {
     try {
         // 检查 IndexedDB 是否已有数据
         if (!forceReload) {
-            const existingData = await getEmoticons();
+            const existingData = await getKaomojis();
             if (existingData && existingData.length > 0) {
-                debugLog(`Loaded ${existingData.length} emoticons from IndexedDB cache`);
+                debugLog(`Loaded ${existingData.length} kaomojis from IndexedDB cache`);
                 return existingData;
             }
         }
 
         // 如果没有数据且提供了远程 URL，尝试加载
         if (defaultURL) {
-            debugLog(`Loading default emoticons from ${defaultURL}...`);
+            debugLog(`Loading default kaomojis from ${defaultURL}...`);
             const remoteData = await loadFromRemote(defaultURL);
 
             if (remoteData && remoteData.length > 0) {
                 // 保存到 IndexedDB
-                await saveEmoticons(remoteData);
-                debugLog(`Initialized with ${remoteData.length} emoticons from remote`);
+                await saveKaomojis(remoteData);
+                debugLog(`Initialized with ${remoteData.length} kaomojis from remote`);
                 return remoteData;
             } else {
                 debugWarn('Failed to load from remote, returning empty array');
@@ -259,7 +259,7 @@ async function initEmoticonStorage(options = {}) {
         // 返回空数组
         return [];
     } catch (error) {
-        debugError('Error initializing emoticon storage:', error);
+        debugError('Error initializing kaomoji storage:', error);
         return [];
     }
 }
@@ -270,7 +270,7 @@ async function initEmoticonStorage(options = {}) {
  */
 async function getStorageStats() {
     try {
-        const data = await getEmoticons();
+        const data = await getKaomojis();
 
         return {
             hasData: data !== null,
@@ -289,10 +289,10 @@ async function getStorageStats() {
 
 // ES Modules 导出
 export {
-    initEmoticonStorage,
-    getEmoticons,
-    saveEmoticons,
-    clearEmoticons,
+    initKaomojiStorage,
+    getKaomojis,
+    saveKaomojis,
+    clearKaomojis,
     getStorageStats,
     setDebugMode
 };

@@ -1,17 +1,17 @@
 /**
- * EmoticonReplacer.js
+ * KaomojiReplacer.js
  * 核心替换引擎 - 可独立使用，不依赖任何框架
- * 负责检测文本中的标记并替换为对应的 emoticon
+ * 负责检测文本中的标记并替换为对应的 kaomoji
  */
 
-class EmoticonReplacer {
+class KaomojiReplacer {
     constructor(searchEngine) {
         this.searchEngine = searchEngine;
 
         // 标记格式配置
         this.config = {
-            // 标记的正则表达式: [emoticon:关键词1,关键词2,...]
-            markerPattern: /\[emoticon:([^\]]+)\]/gi,
+            // 标记的正则表达式: [kaomoji:关键词1,关键词2,...]
+            markerPattern: /\[kaomoji:([^\]]+)\]/gi,
             // 分隔符
             keywordSeparator: ',',
             // 替换策略: 'first' | 'best' | 'all'
@@ -28,15 +28,15 @@ class EmoticonReplacer {
     }
 
     /**
-     * 加载 emoticon 数据
-     * @param {Array} emoticons - emoticon 数据数组
+     * 加载 kaomoji 数据
+     * @param {Array} kaomojis - kaomoji 数据数组
      */
-    loadEmoticons(emoticons) {
-        this.searchEngine.buildIndex(emoticons);
+    loadKaomojis(kaomojis) {
+        this.searchEngine.buildIndex(kaomojis);
     }
 
     /**
-     * 处理文本，替换所有标记为 emoticon
+     * 处理文本，替换所有标记为 kaomoji
      * @param {string} text - 输入文本
      * @param {Object} options - 替换选项
      * @returns {Object} 包含替换后的文本和替换信息
@@ -65,36 +65,36 @@ class EmoticonReplacer {
                 return keepOriginalOnNotFound ? match : '';
             }
 
-            // 搜索匹配的 emoticon
+            // 搜索匹配的 kaomoji
             const searchText = keywords.join(' ');
             const matches = this.searchEngine.search(searchText, 5, threshold);
 
             let replacement = '';
-            let selectedEmoticon = null;
+            let selectedKaomoji = null;
 
             if (matches.length > 0) {
-                // 根据策略选择 emoticon
+                // 根据策略选择 kaomoji
                 switch (strategy) {
                     case 'first':
-                        selectedEmoticon = matches[0];
-                        replacement = matches[0].emoticon;
+                        selectedKaomoji = matches[0];
+                        replacement = matches[0].kaomoji;
                         break;
 
                     case 'best':
                         // 选择分数最高的
-                        selectedEmoticon = matches[0];
-                        replacement = matches[0].emoticon;
+                        selectedKaomoji = matches[0];
+                        replacement = matches[0].kaomoji;
                         break;
 
                     case 'all':
-                        // 返回所有匹配的 emoticon
-                        replacement = matches.map(m => m.emoticon).join(' ');
-                        selectedEmoticon = matches;
+                        // 返回所有匹配的 kaomoji
+                        replacement = matches.map(m => m.kaomoji).join(' ');
+                        selectedKaomoji = matches;
                         break;
 
                     default:
-                        selectedEmoticon = matches[0];
-                        replacement = matches[0].emoticon;
+                        selectedKaomoji = matches[0];
+                        replacement = matches[0].kaomoji;
                 }
 
                 // 记录替换信息
@@ -102,20 +102,20 @@ class EmoticonReplacer {
                     index: matchIndex++,
                     original: match,
                     keywords: keywords,
-                    emoticon: replacement,
+                    kaomoji: replacement,
                     offset: offset,
                     matches: matches,
-                    selected: selectedEmoticon
+                    selected: selectedKaomoji
                 });
 
                 return replacement;
             } else {
-                // 没有找到匹配的 emoticon
+                // 没有找到匹配的 kaomoji
                 replacements.push({
                     index: matchIndex++,
                     original: match,
                     keywords: keywords,
-                    emoticon: null,
+                    kaomoji: null,
                     offset: offset,
                     matches: [],
                     selected: null,
@@ -183,7 +183,7 @@ class EmoticonReplacer {
     }
 
     /**
-     * 查询关键词对应的 emoticon（不需要标记格式）
+     * 查询关键词对应的 kaomoji（不需要标记格式）
      * @param {string} keywords - 关键词字符串
      * @param {number} topK - 返回前 K 个结果
      * @returns {Array} 匹配结果
@@ -207,7 +207,7 @@ class EmoticonReplacer {
      */
     getStats() {
         return {
-            totalEmoticons: this.searchEngine.documents.length,
+            totalKaomojis: this.searchEngine.documents.length,
             avgDocLength: this.searchEngine.avgDocLength,
             config: { ...this.config }
         };
@@ -215,4 +215,4 @@ class EmoticonReplacer {
 }
 
 // ES Modules 导出
-export default EmoticonReplacer;
+export default KaomojiReplacer;

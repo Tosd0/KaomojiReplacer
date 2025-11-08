@@ -1,29 +1,29 @@
 {
-  "name": "emoticon-replacer",
+  "name": "kaomoji-replacer",
   "version": "1.0.4",
   "description": "基于 BM25 算法的颜文字替换插件",
   "type": "module",
-  "main": "./dist/emoticon-replacer.cjs.js",
-  "module": "./dist/emoticon-replacer.esm.js",
-  "browser": "./dist/emoticon-replacer.umd.min.js",
+  "main": "./dist/kaomoji-replacer.cjs.js",
+  "module": "./dist/kaomoji-replacer.esm.js",
+  "browser": "./dist/kaomoji-replacer.umd.min.js",
   "types": "index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/emoticon-replacer.esm.js",
-      "require": "./dist/emoticon-replacer.cjs.js",
+      "import": "./dist/kaomoji-replacer.esm.js",
+      "require": "./dist/kaomoji-replacer.cjs.js",
       "types": "./index.d.ts"
     },
     "./core": {
-      "import": "./src/core/EmoticonReplacer.js",
-      "require": "./dist/emoticon-replacer.cjs.js"
+      "import": "./src/core/KaomojiReplacer.js",
+      "require": "./dist/kaomoji-replacer.cjs.js"
     },
     "./data-manager": {
-      "import": "./src/core/EmoticonDataManager.js",
-      "require": "./dist/emoticon-replacer.cjs.js"
+      "import": "./src/core/KaomojiDataManager.js",
+      "require": "./dist/kaomoji-replacer.cjs.js"
     },
     "./search-engine": {
       "import": "./src/core/SearchEngine.js",
-      "require": "./dist/emoticon-replacer.cjs.js"
+      "require": "./dist/kaomoji-replacer.cjs.js"
     },
     "./package.json": "./package.json"
   },
@@ -39,7 +39,7 @@
     "rollup": "^4.9.6"
   },
   "keywords": [
-    "emoticon",
+    "kaomoji",
     "emoji",
     "text-replacement",
     "bm25",
@@ -53,7 +53,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Tosd0/EmoticonReplacer"
+    "url": "https://github.com/Tosd0/KaomojiReplacer"
   },
   "files": [
     "index.js",
@@ -64,6 +64,6 @@
     "README.md",
     "LICENSE"
   ],
-  "jsdelivr": "dist/emoticon-replacer.umd.min.js",
-  "unpkg": "dist/emoticon-replacer.umd.min.js"
+  "jsdelivr": "dist/kaomoji-replacer.umd.min.js",
+  "unpkg": "dist/kaomoji-replacer.umd.min.js"
 }

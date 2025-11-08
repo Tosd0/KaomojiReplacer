@@ -3,7 +3,7 @@ import commonjs from '@rollup/plugin-commonjs';
 import terser from '@rollup/plugin-terser';
 
 const banner = `/**
- * Emoticon Replacer v${process.env.npm_package_version || '1.0.4'}
+ * Kaomoji Replacer v${process.env.npm_package_version || '1.0.4'}
  * 基于 BM25 算法的颜文字替换插件
  * (c) ${new Date().getFullYear()} Tosd0
  * @license MIT
@@ -14,7 +14,7 @@ const config = [
   {
     input: 'index.js',
     output: {
-      file: 'dist/emoticon-replacer.esm.js',
+      file: 'dist/kaomoji-replacer.esm.js',
       format: 'esm',
       banner
     },
@@ -25,7 +25,7 @@ const config = [
   {
     input: 'index.js',
     output: {
-      file: 'dist/emoticon-replacer.cjs.js',
+      file: 'dist/kaomoji-replacer.cjs.js',
       format: 'cjs',
       banner,
       exports: 'named'
@@ -37,8 +37,8 @@ const config = [
   {
     input: 'index.js',
     output: {
-      name: 'EmoticonReplacer',
-      file: 'dist/emoticon-replacer.umd.js',
+      name: 'KaomojiReplacer',
+      file: 'dist/kaomoji-replacer.umd.js',
       format: 'umd',
       banner,
       exports: 'named',
@@ -60,8 +60,8 @@ const config = [
   {
     input: 'index.js',
     output: {
-      name: 'EmoticonReplacer',
-      file: 'dist/emoticon-replacer.umd.min.js',
+      name: 'KaomojiReplacer',
+      file: 'dist/kaomoji-replacer.umd.min.js',
       format: 'umd',
       banner,
       exports: 'named',

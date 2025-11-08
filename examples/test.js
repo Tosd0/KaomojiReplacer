@@ -6,8 +6,8 @@
 
 // 加载模块
 import SearchEngine from '../src/core/SearchEngine.js';
-import EmoticonReplacer from '../src/core/EmoticonReplacer.js';
-import EmoticonDataManager from '../src/core/EmoticonDataManager.js';
+import KaomojiReplacer from '../src/core/KaomojiReplacer.js';
+import KaomojiDataManager from '../src/core/KaomojiDataManager.js';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -17,27 +17,27 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // 测试数据
-const testEmoticons = [
+const testKaomojis = [
     {
-        emoticon: "= =",
+        kaomoji: "= =",
         keywords: ["无语", "黑脸", "无奈", "翻白眼"],
         weight: 1.0,
         category: ""
     },
     {
-        emoticon: "(╯°□°）╯︵ ┻━┻",
+        kaomoji: "(╯°□°）╯︵ ┻━┻",
         keywords: ["掀桌", "愤怒", "生气", "暴躁"],
         weight: 1.0,
         category: ""
     },
     {
-        emoticon: "ヽ(´▽`)/",
+        kaomoji: "ヽ(´▽`)/",
         keywords: ["开心", "高兴", "快乐", "兴奋"],
         weight: 1.0,
         category: ""
     },
     {
-        emoticon: "_(:3」∠)_",
+        kaomoji: "_(:3」∠)_",
         keywords: ["躺平", "摆烂", "咸鱼", "懒"],
         weight: 1.0,
         category: ""
@@ -133,13 +133,13 @@ suite.test('SearchEngine initialization', () => {
 // 测试 2: 构建索引
 suite.test('SearchEngine buildIndex', () => {
     const engine = new SearchEngine();
-    engine.buildIndex(testEmoticons);
+    engine.buildIndex(testKaomojis);
 
-    assertEqual(engine.documents.length, testEmoticons.length, 'Should load all emoticons');
+    assertEqual(engine.documents.length, testKaomojis.length, 'Should load all kaomojis');
     assert(engine.avgDocLength > 0, 'Average document length should be calculated');
     assert(engine.idf.size > 0, 'IDF should be calculated');
 
-    log(`  Loaded ${engine.documents.length} emoticons`);
+    log(`  Loaded ${engine.documents.length} kaomojis`);
     log(`  Average doc length: ${engine.avgDocLength.toFixed(2)}`);
     log(`  IDF terms: ${engine.idf.size}`);
 });
@@ -147,52 +147,52 @@ suite.test('SearchEngine buildIndex', () => {
 // 测试 3: BM25 搜索
 suite.test('SearchEngine BM25 search', () => {
     const engine = new SearchEngine();
-    engine.buildIndex(testEmoticons);
+    engine.buildIndex(testKaomojis);
 
     const results = engine.search('我很开心', 5, 0);
     assert(results.length > 0, 'Should find matches');
-    assert(results[0].emoticon === 'ヽ(´▽`)/');
+    assert(results[0].kaomoji === 'ヽ(´▽`)/');
     assert(results[0].score > 0, 'Score should be positive');
 
     log(`  Query: "我很开心"`);
     log(`  Found ${results.length} results`);
-    log(`  Best match: ${results[0].emoticon} (score: ${results[0].score.toFixed(2)})`);
+    log(`  Best match: ${results[0].kaomoji} (score: ${results[0].score.toFixed(2)})`);
 });
 
 // 测试 4: 精确匹配
 suite.test('SearchEngine exact match', () => {
     const engine = new SearchEngine();
-    engine.buildIndex(testEmoticons);
+    engine.buildIndex(testKaomojis);
 
     const results = engine.exactMatch('无语黑脸');
     assert(results.length > 0, 'Should find exact matches');
-    assertEqual(results[0].emoticon, '= =', 'Should match the correct emoticon');
+    assertEqual(results[0].kaomoji, '= =', 'Should match the correct kaomoji');
 
     log(`  Query: "无语黑脸"`);
-    log(`  Found: ${results[0].emoticon}`);
+    log(`  Found: ${results[0].kaomoji}`);
 });
 
-// 测试 5: EmoticonReplacer 初始化
-suite.test('EmoticonReplacer initialization', () => {
+// 测试 5: KaomojiReplacer 初始化
+suite.test('KaomojiReplacer initialization', () => {
     const engine = new SearchEngine();
-    const replacer = new EmoticonReplacer(engine);
+    const replacer = new KaomojiReplacer(engine);
 
-    assert(replacer instanceof EmoticonReplacer, 'EmoticonReplacer should be instantiated');
+    assert(replacer instanceof KaomojiReplacer, 'KaomojiReplacer should be instantiated');
     assert(replacer.searchEngine === engine, 'Should store search engine reference');
 });
 
 // 测试 6: 文本替换
-suite.test('EmoticonReplacer text replacement', () => {
+suite.test('KaomojiReplacer text replacement', () => {
     const engine = new SearchEngine();
-    const replacer = new EmoticonReplacer(engine);
-    replacer.loadEmoticons(testEmoticons);
+    const replacer = new KaomojiReplacer(engine);
+    replacer.loadKaomojis(testKaomojis);
 
-    const input = '今天真是[emoticon:无语,黑脸]，想要[emoticon:掀桌,愤怒]';
+    const input = '今天真是[kaomoji:无语,黑脸]，想要[kaomoji:掀桌,愤怒]';
     const result = replacer.replaceText(input);
 
     assert(result.hasReplacements, 'Should have replacements');
-    assert(result.text.includes('= ='), 'Should replace with emoticon');
-    assert(result.text.includes('(╯°□°）╯︵ ┻━┻'), 'Should replace multiple emoticons');
+    assert(result.text.includes('= ='), 'Should replace with kaomoji');
+    assert(result.text.includes('(╯°□°）╯︵ ┻━┻'), 'Should replace multiple kaomojis');
     assertEqual(result.successCount, 2, 'Should have 2 successful replacements');
 
     log(`  Input:  ${input}`);
@@ -201,21 +201,21 @@ suite.test('EmoticonReplacer text replacement', () => {
 });
 
 // 测试 7: 未找到的情况
-suite.test('EmoticonReplacer not found handling', () => {
+suite.test('KaomojiReplacer not found handling', () => {
     const engine = new SearchEngine();
-    const replacer = new EmoticonReplacer(engine);
-    replacer.loadEmoticons(testEmoticons);
+    const replacer = new KaomojiReplacer(engine);
+    replacer.loadKaomojis(testKaomojis);
 
-    const input = '测试[emoticon:不存在的关键词]文本';
+    const input = '测试[kaomoji:不存在的关键词]文本';
 
     // keepOriginalOnNotFound = true
     const result1 = replacer.replaceText(input, { keepOriginalOnNotFound: true });
-    assert(result1.text.includes('[emoticon:不存在的关键词]'), 'Should keep original marker');
+    assert(result1.text.includes('[kaomoji:不存在的关键词]'), 'Should keep original marker');
     assertEqual(result1.successCount, 0, 'Should have 0 successful replacements');
 
     // keepOriginalOnNotFound = false
     const result2 = replacer.replaceText(input, { keepOriginalOnNotFound: false });
-    assert(!result2.text.includes('[emoticon'), 'Should remove marker when not found');
+    assert(!result2.text.includes('[kaomoji'), 'Should remove marker when not found');
 
     // markNotFound = true
     const result3 = replacer.replaceText(input, { markNotFound: true });
@@ -228,12 +228,12 @@ suite.test('EmoticonReplacer not found handling', () => {
 });
 
 // 测试 8: 预览功能
-suite.test('EmoticonReplacer preview', () => {
+suite.test('KaomojiReplacer preview', () => {
     const engine = new SearchEngine();
-    const replacer = new EmoticonReplacer(engine);
-    replacer.loadEmoticons(testEmoticons);
+    const replacer = new KaomojiReplacer(engine);
+    replacer.loadKaomojis(testKaomojis);
 
-    const input = '今天[emoticon:开心,高兴]又[emoticon:躺平,摆烂]';
+    const input = '今天[kaomoji:开心,高兴]又[kaomoji:躺平,摆烂]';
     const preview = replacer.preview(input);
 
     assertEqual(preview.length, 2, 'Should find 2 markers');
@@ -242,41 +242,41 @@ suite.test('EmoticonReplacer preview', () => {
 
     log(`  Found ${preview.length} markers:`);
     preview.forEach((p, i) => {
-        log(`    ${i + 1}. ${p.marker} -> ${p.bestMatch?.emoticon || 'N/A'}`);
+        log(`    ${i + 1}. ${p.marker} -> ${p.bestMatch?.kaomoji || 'N/A'}`);
     });
 });
 
-// 测试 9: EmoticonDataManager 数据加载和验证
-suite.test('EmoticonDataManager load and validate', () => {
-    const manager = new EmoticonDataManager();
-    manager.loadFromArray(testEmoticons);
+// 测试 9: KaomojiDataManager 数据加载和验证
+suite.test('KaomojiDataManager load and validate', () => {
+    const manager = new KaomojiDataManager();
+    manager.loadFromArray(testKaomojis);
 
-    const loaded = manager.getAllEmoticons();
-    assertEqual(loaded.length, testEmoticons.length, 'Should load all items');
+    const loaded = manager.getAllKaomojis();
+    assertEqual(loaded.length, testKaomojis.length, 'Should load all items');
 
     const invalidData = [
-        { emoticon: '😊' }, // 缺少 keywords
-        { keywords: ['test'] }, // 缺少 emoticon
-        { emoticon: '😊', keywords: ['valid'] } // 有效
+        { kaomoji: '😊' }, // 缺少 keywords
+        { keywords: ['test'] }, // 缺少 kaomoji
+        { kaomoji: '😊', keywords: ['valid'] } // 有效
     ];
 
-    const manager2 = new EmoticonDataManager();
+    const manager2 = new KaomojiDataManager();
     manager2.loadFromArray(invalidData);
-    assertEqual(manager2.getAllEmoticons().length, 1, 'Should only load valid items');
+    assertEqual(manager2.getAllKaomojis().length, 1, 'Should only load valid items');
 
-    log(`  Valid items loaded: ${manager2.getAllEmoticons().length}`);
+    log(`  Valid items loaded: ${manager2.getAllKaomojis().length}`);
 });
 
 // 测试 10: 批量替换
-suite.test('EmoticonReplacer batch replacement', () => {
+suite.test('KaomojiReplacer batch replacement', () => {
     const engine = new SearchEngine();
-    const replacer = new EmoticonReplacer(engine);
-    replacer.loadEmoticons(testEmoticons);
+    const replacer = new KaomojiReplacer(engine);
+    replacer.loadKaomojis(testKaomojis);
 
     const texts = [
-        '第一条[emoticon:开心,高兴]消息',
-        '第二条[emoticon:无语]消息',
-        '第三条[emoticon:掀桌,愤怒]消息'
+        '第一条[kaomoji:开心,高兴]消息',
+        '第二条[kaomoji:无语]消息',
+        '第三条[kaomoji:掀桌,愤怒]消息'
     ];
 
     const results = replacer.replaceMultiple(texts);
@@ -290,94 +290,94 @@ suite.test('EmoticonReplacer batch replacement', () => {
 });
 
 // 测试 11: 从文件加载数据
-suite.test('Load emoticons from template file', () => {
-    const dataPath = path.join(__dirname, '../data/emoticons.template.json');
+suite.test('Load kaomojis from template file', () => {
+    const dataPath = path.join(__dirname, '../data/kaomojis.template.json');
     const fileContent = fs.readFileSync(dataPath, 'utf8');
 
-    const manager = new EmoticonDataManager();
+    const manager = new KaomojiDataManager();
     manager.loadFromJSON(fileContent);
 
-    const data = manager.getAllEmoticons();
-    assert(data.length > 0, 'Should load emoticons from file');
-    assert(data[0].emoticon, 'Should have emoticon field');
+    const data = manager.getAllKaomojis();
+    assert(data.length > 0, 'Should load kaomojis from file');
+    assert(data[0].kaomoji, 'Should have kaomoji field');
     assert(Array.isArray(data[0].keywords), 'Should have keywords array');
 
-    log(`  Loaded ${data.length} emoticons from template`);
+    log(`  Loaded ${data.length} kaomojis from template`);
 });
 
 // 测试 12: 复杂文本替换
 suite.test('Complex text replacement', () => {
     const engine = new SearchEngine();
-    const replacer = new EmoticonReplacer(engine);
-    replacer.loadEmoticons(testEmoticons);
+    const replacer = new KaomojiReplacer(engine);
+    replacer.loadKaomojis(testKaomojis);
 
     const input = `
-        今天遇到一个bug，让我很[emoticon:无语,黑脸]。
-        调试了半天，想要[emoticon:掀桌,愤怒]。
-        最后解决了，非常[emoticon:开心,高兴]！
-        现在可以[emoticon:躺平,摆烂]了。
+        今天遇到一个bug，让我很[kaomoji:无语,黑脸]。
+        调试了半天，想要[kaomoji:掀桌,愤怒]。
+        最后解决了，非常[kaomoji:开心,高兴]！
+        现在可以[kaomoji:躺平,摆烂]了。
     `;
 
     const result = replacer.replaceText(input);
 
     assertEqual(result.successCount, 4, 'Should replace all 4 markers');
-    assert(result.text.includes('= ='), 'Should contain replaced emoticons');
+    assert(result.text.includes('= ='), 'Should contain replaced kaomojis');
 
     log(`  Original length: ${input.length}`);
     log(`  Replaced length: ${result.text.length}`);
     log(`  Success count: ${result.successCount}`);
 });
 
-// 测试 13: EmoticonDataManager CRUD - 关键词管理
-suite.test('EmoticonDataManager keyword management', () => {
-    const manager = new EmoticonDataManager();
-    manager.loadFromArray(testEmoticons);
+// 测试 13: KaomojiDataManager CRUD - 关键词管理
+suite.test('KaomojiDataManager keyword management', () => {
+    const manager = new KaomojiDataManager();
+    manager.loadFromArray(testKaomojis);
 
     // 添加关键词
     assert(manager.addKeyword('= =', '不开心'), 'Should add new keyword');
-    const keywords = manager.getKeywordsByEmoticon('= =');
+    const keywords = manager.getKeywordsByKaomoji('= =');
     assert(keywords.includes('不开心'), 'Should contain new keyword');
 
     // 删除关键词
     assert(manager.removeKeyword('= =', '无语'), 'Should remove keyword');
-    const updatedKeywords = manager.getKeywordsByEmoticon('= =');
+    const updatedKeywords = manager.getKeywordsByKaomoji('= =');
     assert(!updatedKeywords.includes('无语'), 'Should not contain removed keyword');
 
     // 批量更新关键词
     assert(manager.updateKeywords('= =', ['测试1', '测试2']), 'Should update keywords');
-    const newKeywords = manager.getKeywordsByEmoticon('= =');
+    const newKeywords = manager.getKeywordsByKaomoji('= =');
     assertEqual(newKeywords.length, 2, 'Should have 2 keywords');
 
     log(`  Keywords after update: ${newKeywords.join(', ')}`);
 });
 
-// 测试 14: EmoticonDataManager CRUD - 颜文字管理
-suite.test('EmoticonDataManager emoticon management', () => {
-    const manager = new EmoticonDataManager();
-    manager.loadFromArray(testEmoticons);
+// 测试 14: KaomojiDataManager CRUD - 颜文字管理
+suite.test('KaomojiDataManager kaomoji management', () => {
+    const manager = new KaomojiDataManager();
+    manager.loadFromArray(testKaomojis);
 
-    const initialCount = manager.getAllEmoticons().length;
+    const initialCount = manager.getAllKaomojis().length;
 
     // 添加颜文字
-    assert(manager.addEmoticon({
-        emoticon: '(๑•̀ㅂ•́)و✧',
+    assert(manager.addKaomoji({
+        kaomoji: '(๑•̀ㅂ•́)و✧',
         keywords: ['加油', '努力'],
         weight: 1.5,
         category: '鼓励'
-    }), 'Should add new emoticon');
-    assertEqual(manager.getAllEmoticons().length, initialCount + 1, 'Count should increase');
+    }), 'Should add new kaomoji');
+    assertEqual(manager.getAllKaomojis().length, initialCount + 1, 'Count should increase');
 
     // 删除颜文字
-    assert(manager.removeEmoticon('(๑•̀ㅂ•́)و✧'), 'Should remove emoticon');
-    assertEqual(manager.getAllEmoticons().length, initialCount, 'Count should return to initial');
+    assert(manager.removeKaomoji('(๑•̀ㅂ•́)و✧'), 'Should remove kaomoji');
+    assertEqual(manager.getAllKaomojis().length, initialCount, 'Count should return to initial');
 
-    log(`  Final count: ${manager.getAllEmoticons().length}`);
+    log(`  Final count: ${manager.getAllKaomojis().length}`);
 });
 
-// 测试 15: EmoticonDataManager 查询功能
-suite.test('EmoticonDataManager query functions', () => {
-    const manager = new EmoticonDataManager();
-    manager.loadFromArray(testEmoticons);
+// 测试 15: KaomojiDataManager 查询功能
+suite.test('KaomojiDataManager query functions', () => {
+    const manager = new KaomojiDataManager();
+    manager.loadFromArray(testKaomojis);
 
     // 设置分类
     manager.setCategory('= =', '表情');
@@ -385,7 +385,7 @@ suite.test('EmoticonDataManager query functions', () => {
 
     // 按分类筛选
     const filtered = manager.filterByCategory('表情');
-    assert(filtered.length >= 2, 'Should find emoticons by category');
+    assert(filtered.length >= 2, 'Should find kaomojis by category');
 
     // 获取所有关键词
     const allKeywords = manager.getAllKeywords();
@@ -393,20 +393,20 @@ suite.test('EmoticonDataManager query functions', () => {
 
     // 按关键词查找
     const found = manager.findByKeyword('开心');
-    assert(found.length > 0, 'Should find emoticons by keyword');
+    assert(found.length > 0, 'Should find kaomojis by keyword');
 
     // 获取统计信息
     const stats = manager.getStats();
-    assert(stats.totalEmoticons > 0, 'Should have stats');
+    assert(stats.totalKaomojis > 0, 'Should have stats');
 
     log(`  Total keywords: ${stats.totalKeywords}`);
     log(`  Total categories: ${stats.totalCategories}`);
 });
 
-// 测试 16: EmoticonDataManager 导出功能
-suite.test('EmoticonDataManager export', () => {
-    const manager = new EmoticonDataManager();
-    manager.loadFromArray(testEmoticons);
+// 测试 16: KaomojiDataManager 导出功能
+suite.test('KaomojiDataManager export', () => {
+    const manager = new KaomojiDataManager();
+    manager.loadFromArray(testKaomojis);
 
     // 导出为 JSON
     const json = manager.exportToJSON(false);
@@ -414,41 +414,41 @@ suite.test('EmoticonDataManager export', () => {
 
     // 导出为数组
     const array = manager.exportToArray();
-    assertEqual(array.length, testEmoticons.length, 'Should export to array');
+    assertEqual(array.length, testKaomojis.length, 'Should export to array');
 
     // 验证导出的数据可以重新加载
-    const manager2 = new EmoticonDataManager();
+    const manager2 = new KaomojiDataManager();
     manager2.loadFromJSON(json);
-    assertEqual(manager2.getAllEmoticons().length, testEmoticons.length, 'Should reload from exported JSON');
+    assertEqual(manager2.getAllKaomojis().length, testKaomojis.length, 'Should reload from exported JSON');
 
     log(`  Exported JSON length: ${json.length} bytes`);
 });
 
 // 测试 17: 数据隔离 - 验证深拷贝防止外部修改
-suite.test('EmoticonDataManager data isolation', () => {
-    const manager = new EmoticonDataManager();
-    manager.loadFromArray(testEmoticons);
+suite.test('KaomojiDataManager data isolation', () => {
+    const manager = new KaomojiDataManager();
+    manager.loadFromArray(testKaomojis);
 
-    // 测试 getAllEmoticons 的数据隔离
-    const emoticons = manager.getAllEmoticons();
-    const originalLength = emoticons[0].keywords.length;
+    // 测试 getAllKaomojis 的数据隔离
+    const kaomojis = manager.getAllKaomojis();
+    const originalLength = kaomojis[0].keywords.length;
 
     // 尝试修改返回的数据
-    emoticons[0].keywords.push('外部添加的关键词');
-    emoticons[0].category = '被修改的分类';
+    kaomojis[0].keywords.push('外部添加的关键词');
+    kaomojis[0].category = '被修改的分类';
 
     // 验证内部数据未被修改
-    const emoticonAgain = manager.getAllEmoticons();
-    assertEqual(emoticonAgain[0].keywords.length, originalLength, 'Keywords should not be modified');
-    assert(!emoticonAgain[0].keywords.includes('外部添加的关键词'), 'External keyword should not exist');
-    assertEqual(emoticonAgain[0].category, testEmoticons[0].category, 'Category should not be modified');
+    const kaomojiAgain = manager.getAllKaomojis();
+    assertEqual(kaomojiAgain[0].keywords.length, originalLength, 'Keywords should not be modified');
+    assert(!kaomojiAgain[0].keywords.includes('外部添加的关键词'), 'External keyword should not exist');
+    assertEqual(kaomojiAgain[0].category, testKaomojis[0].category, 'Category should not be modified');
 
-    // 测试 getEmoticonByText 的数据隔离
-    const emoticon = manager.getEmoticonByText('= =');
-    emoticon.keywords.push('另一个外部关键词');
+    // 测试 getKaomojiByText 的数据隔离
+    const kaomoji = manager.getKaomojiByText('= =');
+    kaomoji.keywords.push('另一个外部关键词');
 
-    const emoticonCheck = manager.getEmoticonByText('= =');
-    assert(!emoticonCheck.keywords.includes('另一个外部关键词'), 'getEmoticonByText should return deep copy');
+    const kaomojiCheck = manager.getKaomojiByText('= =');
+    assert(!kaomojiCheck.keywords.includes('另一个外部关键词'), 'getKaomojiByText should return deep copy');
 
     // 测试 filterByCategory 的数据隔离
     manager.setCategory('= =', '测试分类');
