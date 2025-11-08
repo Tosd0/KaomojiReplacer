@@ -26,18 +26,26 @@ class SearchEngine {
     buildIndex(kaomojis) {
         this.documents = kaomojis.map(item => {
             const keywords = [...item.keywords];
-            // 拆分所有keywords为单字
-            const chars = [];
-            keywords.forEach(keyword => {
-                for (let char of keyword) {
-                    chars.push(char);
-                }
-            });
+            // 拆分所有keywords为单字（使用flatMap简化）
+            const chars = keywords.flatMap(keyword => keyword.split(''));
+
+            // 预计算词频以提高搜索性能
+            const keywordFreq = new Map();
+            for (const keyword of keywords) {
+                keywordFreq.set(keyword, (keywordFreq.get(keyword) || 0) + 1);
+            }
+
+            const charFreq = new Map();
+            for (const char of chars) {
+                charFreq.set(char, (charFreq.get(char) || 0) + 1);
+            }
 
             return {
                 kaomoji: item.kaomoji,
                 keywords: keywords,      // 整词关键词
                 chars: chars,            // 单字关键词
+                keywordFreq: keywordFreq,  // 整词词频Map
+                charFreq: charFreq,        // 单字词频Map
                 weight: item.weight || 1.0,
                 category: item.category || ''
             };
@@ -66,16 +74,13 @@ class SearchEngine {
         const charDocCount = new Map();
         const N = this.documents.length;
 
-        // 统计每个整词出现在多少个文档中
+        // 统计每个整词和单字出现在多少个文档中（合并循环提高效率）
         this.documents.forEach(doc => {
             const uniqueTerms = new Set(doc.keywords);
             uniqueTerms.forEach(term => {
                 termDocCount.set(term, (termDocCount.get(term) || 0) + 1);
             });
-        });
 
-        // 统计每个单字出现在多少个文档中
-        this.documents.forEach(doc => {
             const uniqueChars = new Set(doc.chars);
             uniqueChars.forEach(char => {
                 charDocCount.set(char, (charDocCount.get(char) || 0) + 1);
@@ -105,8 +110,8 @@ class SearchEngine {
         const docLength = doc.keywords.length;
 
         queryTerms.forEach(term => {
-            // 计算词频 (TF)
-            const tf = doc.keywords.filter(k => k === term).length;
+            // 使用预计算的词频Map（避免每次filter）
+            const tf = doc.keywordFreq.get(term) || 0;
 
             if (tf === 0) return;
 
@@ -124,18 +129,13 @@ class SearchEngine {
         let charScore = 0;
         const charDocLength = doc.chars.length;
 
-        // 将查询词拆分成单字
-        const queryChars = [];
-        queryTerms.forEach(term => {
-            for (let char of term) {
-                queryChars.push(char);
-            }
-        });
+        // 将查询词拆分成单字（使用flatMap简化）
+        const queryChars = queryTerms.flatMap(term => term.split(''));
 
         // 对单字进行BM25匹配
         queryChars.forEach(char => {
-            // 计算单字词频
-            const tf = doc.chars.filter(c => c === char).length;
+            // 使用预计算的单字词频Map
+            const tf = doc.charFreq.get(char) || 0;
 
             if (tf === 0) return;
 
