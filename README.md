@@ -39,9 +39,40 @@ git clone https://github.com/Tosd0/EmoticonReplacer.git
 ]
 ```
 
-### 三种使用方式
+### 使用方式
 
-#### 方式 1: 快捷 API（推荐，最简单）
+#### 方式 0: UMD + CDN + IndexedDB（推荐，浏览器环境最简单）
+
+无需安装，只需引入一个 UMD 文件，使用 `initEmoticonStorage` 自动从 CDN 加载并缓存：
+
+```html
+<!-- 引入 UMD 文件 -->
+<script src="https://cdn.jsdelivr.net/npm/emoticon-replacer/dist/emoticon-replacer.umd.min.js"></script>
+
+<script>
+// 从 CDN 加载默认模板（首次从 CDN 加载，之后从 IndexedDB 缓存读取）
+const emoticons = await EmoticonReplacer.initEmoticonStorage({
+    defaultURL: 'https://cdn.jsdelivr.net/npm/emoticon-replacer/data/emoticons.template.json'
+});
+
+// 创建替换器
+const replacer = EmoticonReplacer.createReplacer({ emoticons });
+
+// 使用
+const result = replacer.replaceText('今天很[emoticon:开心,高兴]');
+console.log(result.text); // 输出: 今天很ヽ(´▽`)/
+</script>
+```
+
+**特性：**
+- ✅ 只需一个 UMD 文件，无需额外依赖
+- ✅ 首次从 CDN 加载，之后从 IndexedDB 缓存读取
+- ✅ 离线可用（数据已缓存）
+- ✅ 支持 jsDelivr 和 unpkg 两种 CDN
+
+**示例文件：** [examples/umd-example.html](examples/umd-example.html)
+
+#### 方式 1: 快捷 API（推荐，Node.js 环境最简单）
 
 ```javascript
 const { quickReplace, loadFromFile } = require('emoticon-replacer');
