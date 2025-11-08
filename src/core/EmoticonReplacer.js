@@ -214,10 +214,5 @@ class EmoticonReplacer {
     }
 }
 
-// 导出（支持 CommonJS 和 ES6）
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = EmoticonReplacer;
-}
-if (typeof window !== 'undefined') {
-    window.EmoticonReplacer = EmoticonReplacer;
-}
+// ES Modules 导出
+export default EmoticonReplacer;

@@ -8,12 +8,12 @@
  */
 
 // 导入核心类
-const EmoticonReplacer = require('./src/core/EmoticonReplacer');
-const SearchEngine = require('./src/core/SearchEngine');
-const EmoticonDataManager = require('./src/core/EmoticonDataManager');
+import EmoticonReplacer from './src/core/EmoticonReplacer.js';
+import SearchEngine from './src/core/SearchEngine.js';
+import EmoticonDataManager from './src/core/EmoticonDataManager.js';
 
 // 导入存储模块
-const IndexedDBStorage = require('./src/storage/IndexedDBStorage');
+import * as IndexedDBStorage from './src/storage/IndexedDBStorage.js';
 
 // ========== 工厂函数 ==========
 
@@ -128,11 +128,11 @@ function quickQuery(keywords, emoticons, topK = 5) {
  */
 async function loadFromFile(filePath) {
     // 检查是否在 Node.js 环境
-    if (typeof require === 'undefined' || typeof process === 'undefined') {
+    if (typeof process === 'undefined') {
         throw new Error('loadFromFile is only available in Node.js environment');
     }
 
-    const fs = require('fs').promises;
+    const { promises: fs } = await import('fs');
     const fileContent = await fs.readFile(filePath, 'utf8');
     const manager = new EmoticonDataManager();
     manager.loadFromJSON(fileContent);
@@ -238,8 +238,7 @@ const REPLACE_STRATEGIES = {
 
 // ========== 导出 ==========
 
-// CommonJS 导出
-module.exports = {
+export {
     // 核心类
     EmoticonReplacer,
     SearchEngine,
@@ -263,15 +262,20 @@ module.exports = {
     batchReplace,
 
     // 存储 API (IndexedDB)
-    initEmoticonStorage: IndexedDBStorage.initEmoticonStorage,
-    getEmoticons: IndexedDBStorage.getEmoticons,
-    saveEmoticons: IndexedDBStorage.saveEmoticons,
-    clearEmoticons: IndexedDBStorage.clearEmoticons,
-    getStorageStats: IndexedDBStorage.getStorageStats,
-    setDebugMode: IndexedDBStorage.setDebugMode,
+    IndexedDBStorage,
 
     // 常量
     VERSION,
     DEFAULT_CONFIG,
     REPLACE_STRATEGIES
 };
+
+// 导出 IndexedDB 存储函数（解构便于使用）
+export const {
+    initEmoticonStorage,
+    getEmoticons,
+    saveEmoticons,
+    clearEmoticons,
+    getStorageStats,
+    setDebugMode
+} = IndexedDBStorage;

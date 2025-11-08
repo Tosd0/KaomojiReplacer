@@ -10,7 +10,30 @@ const banner = `/**
  */`;
 
 const config = [
-  // UMD build (unminified)
+  // ES Modules build
+  {
+    input: 'index.js',
+    output: {
+      file: 'dist/emoticon-replacer.esm.js',
+      format: 'esm',
+      banner
+    },
+    external: ['fs']
+  },
+
+  // CommonJS build
+  {
+    input: 'index.js',
+    output: {
+      file: 'dist/emoticon-replacer.cjs.js',
+      format: 'cjs',
+      banner,
+      exports: 'named'
+    },
+    external: ['fs']
+  },
+
+  // UMD build (unminified) - for browsers
   {
     input: 'index.js',
     output: {
@@ -32,7 +55,8 @@ const config = [
     ],
     external: ['fs']
   },
-  // UMD build (minified)
+
+  // UMD build (minified) - for browsers
   {
     input: 'index.js',
     output: {

@@ -266,13 +266,13 @@
     </div>
 
     <!-- 加载库 -->
-    <script src="../src/core/SearchEngine.js"></script>
-    <script src="../src/core/EmoticonReplacer.js"></script>
-    <script src="../src/core/EmoticonDataManager.js"></script>
-    <script src="../src/storage/IndexedDBStorage.js"></script>
-    <!-- index.js 使用 CommonJS，浏览器不支持，已移除 -->
+    <script type="module">
+        // 导入核心模块
+        import SearchEngine from '../src/core/SearchEngine.js';
+        import EmoticonReplacer from '../src/core/EmoticonReplacer.js';
+        import EmoticonDataManager from '../src/core/EmoticonDataManager.js';
+        import * as IndexedDBStorage from '../src/storage/IndexedDBStorage.js';
 
-    <script>
         let currentEmoticons = [];
 
         // 日志记录
@@ -292,7 +292,7 @@
         // 更新统计信息
         async function refreshStats() {
             try {
-                const stats = await window.IndexedDBStorage.getStorageStats();
+                const stats = await IndexedDBStorage.getStorageStats();
 
                 document.getElementById('statCount').textContent = stats.count;
                 document.getElementById('statSize').textContent = stats.sizeKB + ' KB';
@@ -314,7 +314,7 @@
                 output.textContent = '正在初始化...';
                 output.className = 'output';
 
-                const emoticons = await window.IndexedDBStorage.initEmoticonStorage({
+                const emoticons = await IndexedDBStorage.initEmoticonStorage({
                     defaultURL: url || null,
                     forceReload: forceReload
                 });
@@ -372,7 +372,7 @@
             const output = document.getElementById('manageOutput');
 
             try {
-                const data = await window.IndexedDBStorage.getEmoticons();
+                const data = await IndexedDBStorage.getEmoticons();
 
                 if (data) {
                     currentEmoticons = data;
@@ -402,7 +402,7 @@
             const output = document.getElementById('manageOutput');
 
             try {
-                await window.IndexedDBStorage.clearEmoticons();
+                await IndexedDBStorage.clearEmoticons();
                 currentEmoticons = [];
 
                 output.textContent = '✅ 缓存已清空';
@@ -418,10 +418,18 @@
         }
 
         // 页面加载时初始化日志
-        window.addEventListener('load', () => {
+        window.addEventListener('DOMContentLoaded', () => {
             addLog('页面加载完成，准备就绪！');
             refreshStats();
         });
+
+        // 将函数暴露到全局作用域，以便 HTML onclick 可以调用
+        window.initStorage = initStorage;
+        window.replaceText = replaceText;
+        window.readStorage = readStorage;
+        window.refreshStats = refreshStats;
+        window.clearStorage = clearStorage;
+        window.clearLog = clearLog;
     </script>
 </body>
 </html>

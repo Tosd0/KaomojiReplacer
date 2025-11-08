@@ -137,11 +137,12 @@
     </div>
 
     <!-- 加载核心模块 -->
-    <script src="../src/core/SearchEngine.js"></script>
-    <script src="../src/core/EmoticonReplacer.js"></script>
-    <script src="../src/core/EmoticonDataManager.js"></script>
+    <script type="module">
+        // 导入核心模块
+        import SearchEngine from '../src/core/SearchEngine.js';
+        import EmoticonReplacer from '../src/core/EmoticonReplacer.js';
+        import EmoticonDataManager from '../src/core/EmoticonDataManager.js';
 
-    <script>
         // 初始化
         let replacer = null;
 
@@ -300,7 +301,17 @@
         }
 
         // 页面加载时初始化
-        window.onload = init;
+        window.addEventListener('DOMContentLoaded', init);
+
+        // 将函数暴露到全局作用域，以便 HTML onclick 可以调用
+        window.processText = processText;
+        window.previewText = previewText;
+        window.clearOutput = clearOutput;
+        window.loadExample1 = loadExample1;
+        window.loadExample2 = loadExample2;
+        window.loadExample3 = loadExample3;
+        window.searchKeyword = searchKeyword;
+        window.exactSearch = exactSearch;
     </script>
 </body>
 </html>

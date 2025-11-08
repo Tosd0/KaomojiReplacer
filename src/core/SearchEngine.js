@@ -183,10 +183,5 @@ class SearchEngine {
     }
 }
 
-// 导出（支持 CommonJS 和 ES6）
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = SearchEngine;
-}
-if (typeof window !== 'undefined') {
-    window.SearchEngine = SearchEngine;
-}
+// ES Modules 导出
+export default SearchEngine;

@@ -4,7 +4,7 @@
  * 运行: node examples/api-usage.js
  */
 
-const {
+import {
     // 快捷 API
     quickReplace,
     quickQuery,
@@ -27,7 +27,7 @@ const {
     // 常量
     VERSION,
     REPLACE_STRATEGIES
-} = require('../index.js');
+} from '../index.js';
 
 // 测试数据
 const testEmoticons = [
