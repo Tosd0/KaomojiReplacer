@@ -9,11 +9,14 @@ class SearchEngine {
         // BM25 参数
         this.k1 = config.k1 || 1.5;  // 词频饱和参数
         this.b = config.b || 0.75;   // 长度归一化参数
+        this.charWeight = config.charWeight || 0.6; // 单字匹配权重系数
 
         // 索引数据
         this.documents = [];         // 文档列表（每个kaomoji的keywords作为一个文档）
-        this.avgDocLength = 0;       // 平均文档长度
-        this.idf = new Map();        // IDF 值缓存
+        this.avgDocLength = 0;       // 平均文档长度（整词）
+        this.avgCharDocLength = 0;   // 平均文档长度（单字）
+        this.idf = new Map();        // 整词IDF值缓存
+        this.charIdf = new Map();    // 单字IDF值缓存
     }
 
     /**
@@ -21,30 +24,49 @@ class SearchEngine {
      * @param {Array} kaomojis - kaomoji 数据数组
      */
     buildIndex(kaomojis) {
-        this.documents = kaomojis.map(item => ({
-            kaomoji: item.kaomoji,
-            keywords: [...item.keywords],
-            weight: item.weight || 1.0,
-            category: item.category || ''
-        }));
+        this.documents = kaomojis.map(item => {
+            const keywords = [...item.keywords];
+            // 拆分所有keywords为单字
+            const chars = [];
+            keywords.forEach(keyword => {
+                for (let char of keyword) {
+                    chars.push(char);
+                }
+            });
 
-        // 计算平均文档长度
+            return {
+                kaomoji: item.kaomoji,
+                keywords: keywords,      // 整词关键词
+                chars: chars,            // 单字关键词
+                weight: item.weight || 1.0,
+                category: item.category || ''
+            };
+        });
+
+        // 计算平均文档长度（整词）
         const totalLength = this.documents.reduce((sum, doc) =>
             sum + doc.keywords.length, 0);
         this.avgDocLength = totalLength / this.documents.length;
 
-        // 计算 IDF
+        // 计算平均文档长度（单字）
+        const totalCharLength = this.documents.reduce((sum, doc) =>
+            sum + doc.chars.length, 0);
+        this.avgCharDocLength = totalCharLength / this.documents.length;
+
+        // 计算整词和单字的IDF
         this._calculateIDF();
     }
 
     /**
      * 计算 IDF (Inverse Document Frequency)
+     * 分别计算整词和单字的IDF
      */
     _calculateIDF() {
         const termDocCount = new Map();
+        const charDocCount = new Map();
         const N = this.documents.length;
 
-        // 统计每个词出现在多少个文档中
+        // 统计每个整词出现在多少个文档中
         this.documents.forEach(doc => {
             const uniqueTerms = new Set(doc.keywords);
             uniqueTerms.forEach(term => {
@@ -52,20 +74,34 @@ class SearchEngine {
             });
         });
 
-        // 计算 IDF: log((N - df + 0.5) / (df + 0.5) + 1)
+        // 统计每个单字出现在多少个文档中
+        this.documents.forEach(doc => {
+            const uniqueChars = new Set(doc.chars);
+            uniqueChars.forEach(char => {
+                charDocCount.set(char, (charDocCount.get(char) || 0) + 1);
+            });
+        });
+
+        // 计算整词 IDF: log((N - df + 0.5) / (df + 0.5) + 1)
         termDocCount.forEach((df, term) => {
             this.idf.set(term, Math.log((N - df + 0.5) / (df + 0.5) + 1));
+        });
+
+        // 计算单字 IDF: log((N - df + 0.5) / (df + 0.5) + 1)
+        charDocCount.forEach((df, char) => {
+            this.charIdf.set(char, Math.log((N - df + 0.5) / (df + 0.5) + 1));
         });
     }
 
     /**
-     * 计算 BM25 分数
+     * 计算 BM25 分数（整词匹配优先 + 单字匹配补充）
      * @param {Array} queryTerms - 查询词列表
      * @param {Object} doc - 文档对象
      * @returns {number} BM25 分数
      */
     _calculateBM25(queryTerms, doc) {
-        let score = 0;
+        // 1. 整词匹配分数
+        let wholeWordScore = 0;
         const docLength = doc.keywords.length;
 
         queryTerms.forEach(term => {
@@ -81,11 +117,43 @@ class SearchEngine {
             const numerator = tf * (this.k1 + 1);
             const denominator = tf + this.k1 * (1 - this.b + this.b * (docLength / this.avgDocLength));
 
-            score += idf * (numerator / denominator);
+            wholeWordScore += idf * (numerator / denominator);
         });
 
+        // 2. 单字匹配分数
+        let charScore = 0;
+        const charDocLength = doc.chars.length;
+
+        // 将查询词拆分成单字
+        const queryChars = [];
+        queryTerms.forEach(term => {
+            for (let char of term) {
+                queryChars.push(char);
+            }
+        });
+
+        // 对单字进行BM25匹配
+        queryChars.forEach(char => {
+            // 计算单字词频
+            const tf = doc.chars.filter(c => c === char).length;
+
+            if (tf === 0) return;
+
+            // 获取单字 IDF
+            const idf = this.charIdf.get(char) || 0;
+
+            // BM25 公式
+            const numerator = tf * (this.k1 + 1);
+            const denominator = tf + this.k1 * (1 - this.b + this.b * (charDocLength / this.avgCharDocLength));
+
+            charScore += idf * (numerator / denominator);
+        });
+
+        // 3. 组合分数：整词分数 + 单字分数 × 权重系数
+        const totalScore = wholeWordScore + (charScore * this.charWeight);
+
         // 应用权重
-        return score * doc.weight;
+        return totalScore * doc.weight;
     }
 
     /**
@@ -119,8 +187,9 @@ class SearchEngine {
         }));
 
         // 过滤、排序并返回 top K
+        // 注意：现在即使没有整词匹配，单字匹配也可能有分数，所以只检查 score > threshold
         return results
-            .filter(r => r.score > threshold && r.matchedKeywords.length > 0)
+            .filter(r => r.score > threshold)
             .sort((a, b) => b.score - a.score)
             .slice(0, topK);
     }

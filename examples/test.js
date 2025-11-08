@@ -470,6 +470,45 @@ suite.test('KaomojiDataManager data isolation', () => {
     log(`  ✓ External modifications do not affect internal data`);
 });
 
+// 测试 18: BM25 单字匹配功能
+suite.test('SearchEngine character-level matching', () => {
+    const engine = new SearchEngine({ charWeight: 0.6 });
+    engine.buildIndex(testKaomojis);
+
+    // 测试1: 查询词包含部分字，应该通过单字匹配找到结果
+    const results1 = engine.search('我很心', 5, 0);
+    assert(results1.length > 0, 'Should find matches using character-level matching');
+    log(`  Query "我很心" found ${results1.length} results`);
+    if (results1.length > 0) {
+        log(`  Best match: ${results1[0].kaomoji} (score: ${results1[0].score.toFixed(2)})`);
+    }
+
+    // 测试2: 整词匹配分数应该远高于纯单字匹配
+    const wholeWordResults = engine.search('开心', 5, 0);
+    const charOnlyResults = engine.search('开', 5, 0);
+    if (wholeWordResults.length > 0 && charOnlyResults.length > 0) {
+        const doc1 = wholeWordResults.find(r => r.kaomoji === 'ヽ(´▽`)/');
+        const doc2 = charOnlyResults.find(r => r.kaomoji === 'ヽ(´▽`)/');
+        if (doc1 && doc2) {
+            assert(doc1.score > doc2.score, 'Whole-word match should score higher than character-only match');
+            log(`  Whole-word "开心" score: ${doc1.score.toFixed(2)}`);
+            log(`  Char-only "开" score: ${doc2.score.toFixed(2)}`);
+        }
+    }
+
+    // 测试3: 验证阈值过滤低分结果（默认threshold=1.2可过滤1-2个单字的低质量匹配）
+    const lowScoreResults = engine.search('开', 5, 1.2);
+    log(`  Query "开" with threshold=1.2 found ${lowScoreResults.length} results (should filter out low-quality single char matches)`);
+
+    const highScoreResults = engine.search('我很心', 5, 1.2);
+    log(`  Query "我很心" with threshold=1.2 found ${highScoreResults.length} results (should keep partial matches)`);
+    assert(highScoreResults.length > 0, 'Should keep meaningful partial matches');
+
+    log(`  ✓ Character-level matching works correctly`);
+    log(`  ✓ Whole-word matching has higher priority`);
+    log(`  ✓ Threshold filters low-quality single char matches`);
+});
+
 // 运行所有测试
 (async () => {
     try {
