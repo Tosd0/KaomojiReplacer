@@ -101,10 +101,11 @@ class SearchEngine {
     /**
      * 计算 BM25 分数（整词匹配优先 + 单字匹配补充）
      * @param {Array} queryTerms - 查询词列表
+     * @param {Array} queryChars - 查询单字列表（去重）
      * @param {Object} doc - 文档对象
      * @returns {number} BM25 分数
      */
-    _calculateBM25(queryTerms, doc) {
+    _calculateBM25(queryTerms, queryChars, doc) {
         // 1. 整词匹配分数
         let wholeWordScore = 0;
         const docLength = doc.keywords.length;
@@ -129,10 +130,7 @@ class SearchEngine {
         let charScore = 0;
         const charDocLength = doc.chars.length;
 
-        // 将查询词拆分成单字（使用flatMap简化）
-        const queryChars = queryTerms.flatMap(term => term.split(''));
-
-        // 对单字进行BM25匹配
+        // 对单字进行BM25匹配（queryChars已去重，避免重复计分）
         queryChars.forEach(char => {
             // 使用预计算的单字词频Map
             const tf = doc.charFreq.get(char) || 0;
@@ -178,10 +176,13 @@ class SearchEngine {
         // 转换为 Set 以提高查找效率 (O(1) vs O(n))
         const queryTermsSet = new Set(queryTerms);
 
+        // 提取并去重查询单字（避免重复计分和重复计算）
+        const queryChars = [...new Set(queryTerms.flatMap(term => term.split('')))];
+
         // 计算每个文档的分数
         const results = this.documents.map(doc => ({
             kaomoji: doc.kaomoji,
-            score: this._calculateBM25(queryTerms, doc),
+            score: this._calculateBM25(queryTerms, queryChars, doc),
             matchedKeywords: doc.keywords.filter(k => queryTermsSet.has(k)),
             category: doc.category
         }));

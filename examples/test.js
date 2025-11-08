@@ -492,20 +492,27 @@ suite.test('SearchEngine character-level matching', () => {
         const doc2 = charOnlyResults.find(r => r.kaomoji === 'ヽ(´▽`)/');
         assert(doc2, 'Should find document in char-only results');
 
+        // 验证分数差异
         assert(doc1.score > doc2.score, 'Whole-word match should score higher than character-only match');
+        assert(doc1.score > 2.0, 'Whole-word match should score > 2.0');
+        assert(doc2.score < 1.0, 'Single char match should score < 1.0');
+
         log(`  Whole-word "开心" score: ${doc1.score.toFixed(2)}`);
         log(`  Char-only "开" score: ${doc2.score.toFixed(2)}`);
     } else {
         assert(false, 'Search results for "开心" or "开" were empty.');
     }
 
-    // 测试3: 验证阈值过滤低分结果（默认threshold=1.2可过滤1-2个单字的低质量匹配）
-    const lowScoreResults = engine.search('开', 5, 1.2);
-    log(`  Query "开" with threshold=1.2 found ${lowScoreResults.length} results (should filter out low-quality single char matches)`);
+    // 测试3: 验证阈值过滤低分结果
+    // 修复重复计分bug后，单字匹配分数约为0.7，完整词匹配约为2.5+
+    // threshold=0.5可以保留有单字匹配的结果，同时过滤噪音
+    const lowScoreResults = engine.search('开', 5, 0.5);
+    log(`  Query "开" with threshold=0.5 found ${lowScoreResults.length} results`);
+    assert(lowScoreResults.length > 0, 'Single char match should be kept with threshold=0.5');
 
-    const highScoreResults = engine.search('我很心', 5, 1.2);
-    log(`  Query "我很心" with threshold=1.2 found ${highScoreResults.length} results (should keep partial matches)`);
-    assert(highScoreResults.length > 0, 'Should keep meaningful partial matches');
+    const partialResults = engine.search('我很心', 5, 0.5);
+    log(`  Query "我很心" with threshold=0.5 found ${partialResults.length} results`);
+    assert(partialResults.length > 0, 'Partial matches should be kept with threshold=0.5');
 
     log(`  ✓ Character-level matching works correctly`);
     log(`  ✓ Whole-word matching has higher priority`);
