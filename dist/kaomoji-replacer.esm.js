@@ -1388,4 +1388,4 @@ const {
     setDebugMode
 } = IndexedDBStorage;
 
-export { DEFAULT_CONFIG, KaomojiDataManager, KaomojiReplacer, IndexedDBStorage, REPLACE_STRATEGIES, SearchEngine, VERSION, batchReplace, clearKaomojis, createManager, createReplacer, createSearchEngine, getKaomojis, getStorageStats, initKaomojiStorage, loadFromFile, loadFromURL, quickQuery, quickReplace, saveKaomojis, setDebugMode, validateData };
+export { DEFAULT_CONFIG, IndexedDBStorage, KaomojiDataManager, KaomojiReplacer, REPLACE_STRATEGIES, SearchEngine, VERSION, batchReplace, clearKaomojis, createManager, createReplacer, createSearchEngine, getKaomojis, getStorageStats, initKaomojiStorage, loadFromFile, loadFromURL, quickQuery, quickReplace, saveKaomojis, setDebugMode, validateData };

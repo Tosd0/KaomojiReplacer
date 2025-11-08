@@ -1391,9 +1391,9 @@ const {
 } = IndexedDBStorage;
 
 exports.DEFAULT_CONFIG = DEFAULT_CONFIG;
+exports.IndexedDBStorage = IndexedDBStorage;
 exports.KaomojiDataManager = KaomojiDataManager;
 exports.KaomojiReplacer = KaomojiReplacer;
-exports.IndexedDBStorage = IndexedDBStorage;
 exports.REPLACE_STRATEGIES = REPLACE_STRATEGIES;
 exports.SearchEngine = SearchEngine;
 exports.VERSION = VERSION;
