@@ -75,7 +75,7 @@ console.log(result.text); // 输出: 今天很ヽ(´▽`)/
 #### 方式 1: 快捷 API（推荐，Node.js 环境最简单）
 
 ```javascript
-const { quickReplace, loadFromFile } = require('emoticon-replacer');
+import { quickReplace, loadFromFile } from 'emoticon-replacer';
 
 // 从文件加载数据
 const emoticons = await loadFromFile('./data/emoticons.template.json');
@@ -88,7 +88,7 @@ console.log(result.text); // 输出: 今天真是 = =
 #### 方式 2: 工厂函数（推荐，灵活配置）
 
 ```javascript
-const { createReplacer, loadFromFile } = require('emoticon-replacer');
+import { createReplacer, loadFromFile } from 'emoticon-replacer';
 
 // 加载数据
 const emoticons = await loadFromFile('./data/emoticons.template.json');
@@ -104,7 +104,7 @@ console.log(result.text);
 #### 方式 3: 直接使用类（最灵活）
 
 ```javascript
-const { EmoticonReplacer, SearchEngine, EmoticonDataManager } = require('emoticon-replacer');
+import { EmoticonReplacer, SearchEngine, EmoticonDataManager } from 'emoticon-replacer';
 
 // 1. 创建数据管理器并加载数据
 const manager = new EmoticonDataManager();
@@ -133,7 +133,7 @@ const filtered = manager.filterByCategory('表情'); // 按分类筛选
 适合前端项目，自动管理数据持久化：
 
 ```javascript
-const { initEmoticonStorage, quickReplace } = require('emoticon-replacer');
+import { initEmoticonStorage, quickReplace } from 'emoticon-replacer';
 
 // 初始化存储（首次自动从远程加载，之后使用缓存）
 const emoticons = await initEmoticonStorage({
@@ -210,7 +210,7 @@ EmoticonReplacer/
 一行代码完成文本替换：
 
 ```javascript
-const { quickReplace } = require('emoticon-replacer');
+import { quickReplace } from 'emoticon-replacer';
 
 const result = quickReplace(
   '今天[emoticon:开心,高兴]',
@@ -230,7 +230,7 @@ console.log(result.successCount);
 快速查询关键词对应的颜文字：
 
 ```javascript
-const { quickQuery } = require('emoticon-replacer');
+import { quickQuery } from 'emoticon-replacer';
 
 const results = quickQuery('开心', emoticons, 5);
 console.log(results[0].emoticon);
@@ -241,7 +241,7 @@ console.log(results[0].emoticon);
 批量处理多个文本：
 
 ```javascript
-const { batchReplace } = require('emoticon-replacer');
+import { batchReplace } from 'emoticon-replacer';
 
 const texts = [
   '第一条[emoticon:开心]消息',
@@ -259,7 +259,7 @@ results.forEach(r => console.log(r.text));
 创建完整配置的替换器：
 
 ```javascript
-const { createReplacer } = require('emoticon-replacer');
+import { createReplacer } from 'emoticon-replacer';
 
 const replacer = createReplacer({
   emoticons: [...],           // 数据数组
@@ -278,7 +278,7 @@ const replacer = createReplacer({
 创建数据管理器：
 
 ```javascript
-const { createManager } = require('emoticon-replacer');
+import { createManager } from 'emoticon-replacer';
 
 // 从数组创建
 const manager = createManager([...]);
@@ -292,7 +292,7 @@ const manager2 = createManager(jsonString);
 #### EmoticonReplacer
 
 ```javascript
-const { EmoticonReplacer, SearchEngine } = require('emoticon-replacer');
+import { EmoticonReplacer, SearchEngine } from 'emoticon-replacer';
 
 const engine = new SearchEngine();
 const replacer = new EmoticonReplacer(engine);
@@ -315,7 +315,7 @@ replacer.exactQuery('开心');
 #### SearchEngine
 
 ```javascript
-const { SearchEngine } = require('emoticon-replacer');
+import { SearchEngine } from 'emoticon-replacer';
 
 // 创建搜索引擎
 const engine = new SearchEngine({
@@ -336,7 +336,7 @@ engine.exactMatch('文本');
 #### EmoticonDataManager
 
 ```javascript
-const { EmoticonDataManager } = require('emoticon-replacer');
+import { EmoticonDataManager } from 'emoticon-replacer';
 
 // 数据加载
 const manager = new EmoticonDataManager();
@@ -374,6 +374,8 @@ const array = manager.exportToArray();       // 导出为数组
 ### 数据加载与工具
 
 ```javascript
+import { loadFromFile, loadFromURL, validateData } from 'emoticon-replacer';
+
 // Node.js 环境：从文件加载
 const emoticons = await loadFromFile('./data/emoticons.json');
 
@@ -389,13 +391,13 @@ const result = validateData(data);
 前端项目推荐使用 IndexedDB 存储：
 
 ```javascript
-const {
+import {
   initEmoticonStorage,
   getEmoticons,
   saveEmoticons,
   clearEmoticons,
   getStorageStats
-} = require('emoticon-replacer');
+} from 'emoticon-replacer';
 
 // 初始化存储（自动管理加载和缓存）
 const emoticons = await initEmoticonStorage({

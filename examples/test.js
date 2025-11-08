@@ -5,11 +5,16 @@
  */
 
 // 加载模块
-const SearchEngine = require('../src/core/SearchEngine.js');
-const EmoticonReplacer = require('../src/core/EmoticonReplacer.js');
-const EmoticonDataManager = require('../src/core/EmoticonDataManager.js');
-const fs = require('fs');
-const path = require('path');
+import SearchEngine from '../src/core/SearchEngine.js';
+import EmoticonReplacer from '../src/core/EmoticonReplacer.js';
+import EmoticonDataManager from '../src/core/EmoticonDataManager.js';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+// ES Modules 环境中获取 __dirname
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // 测试数据
 const testEmoticons = [

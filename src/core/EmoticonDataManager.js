@@ -441,10 +441,5 @@ class EmoticonDataManager {
     }
 }
 
-// 导出（支持 CommonJS 和 ES6）
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = EmoticonDataManager;
-}
-if (typeof window !== 'undefined') {
-    window.EmoticonDataManager = EmoticonDataManager;
-}
+// ES Modules 导出
+export default EmoticonDataManager;

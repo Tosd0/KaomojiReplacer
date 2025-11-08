@@ -2,22 +2,28 @@
   "name": "emoticon-replacer",
   "version": "1.0.3",
   "description": "基于 BM25 算法的颜文字替换插件",
-  "main": "index.js",
+  "type": "module",
+  "main": "./dist/emoticon-replacer.cjs.js",
+  "module": "./dist/emoticon-replacer.esm.js",
+  "browser": "./dist/emoticon-replacer.umd.min.js",
   "types": "index.d.ts",
   "exports": {
     ".": {
-      "require": "./index.js",
-      "import": "./index.js",
+      "import": "./dist/emoticon-replacer.esm.js",
+      "require": "./dist/emoticon-replacer.cjs.js",
       "types": "./index.d.ts"
     },
     "./core": {
-      "require": "./src/core/EmoticonReplacer.js"
+      "import": "./src/core/EmoticonReplacer.js",
+      "require": "./dist/emoticon-replacer.cjs.js"
     },
     "./data-manager": {
-      "require": "./src/core/EmoticonDataManager.js"
+      "import": "./src/core/EmoticonDataManager.js",
+      "require": "./dist/emoticon-replacer.cjs.js"
     },
     "./search-engine": {
-      "require": "./src/core/SearchEngine.js"
+      "import": "./src/core/SearchEngine.js",
+      "require": "./dist/emoticon-replacer.cjs.js"
     },
     "./package.json": "./package.json"
   },

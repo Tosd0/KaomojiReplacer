@@ -287,8 +287,8 @@ async function getStorageStats() {
     }
 }
 
-// 导出（支持 CommonJS 和 ES6）
-const IndexedDBStorage = {
+// ES Modules 导出
+export {
     initEmoticonStorage,
     getEmoticons,
     saveEmoticons,
@@ -296,11 +296,3 @@ const IndexedDBStorage = {
     getStorageStats,
     setDebugMode
 };
-
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = IndexedDBStorage;
-}
-
-if (typeof window !== 'undefined') {
-    window.IndexedDBStorage = IndexedDBStorage;
-}
