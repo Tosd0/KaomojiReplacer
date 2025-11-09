@@ -195,8 +195,7 @@ async function main() {
                     `加载了 ${kaomojis.length} 个颜文字<br>` +
                     `数据已缓存到 IndexedDB`;
             } catch (error) {
-                document.getElementById('init-output').innerHTML =
-                    `❌ 错误: ${error.message}`;
+                document.getElementById('init-output').textContent = `❌ 错误: ${error.message}`;
             }
         }
 
