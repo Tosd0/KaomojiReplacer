@@ -243,7 +243,7 @@ async function main() {
             });
 
             const afterCount = manager.getAllKaomojis().length;
-            const newKaomoji = manager.findByKeyword('加油')[0];
+            const newKaomoji = manager.findByKeyword(['加油', '努力', '奋斗'])[0];
 
             if (!newKaomoji) {
                 document.getElementById('create-output').innerHTML = '❌ 创建后未能找到新颜文字';

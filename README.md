@@ -96,7 +96,7 @@ console.log(result.text); // 输出: 今天很ヽ(´▽`)/
 - ✅ 离线可用
 - ✅ 支持 jsDelivr 和 unpkg 两种 CDN
 
-**示例文件：** [examples/umd-example.html](examples/umd-example.html)
+**示例文件：** [examples/quick-start.html](examples/quick-start.html)
 
 #### 方式 1: 快捷 API（推荐，Node.js 环境最简单）
 
