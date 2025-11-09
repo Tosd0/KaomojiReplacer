@@ -125,8 +125,9 @@
         <h2>🔍 关键词查询</h2>
         <div class="query-section">
             <input type="text" id="queryInput" placeholder="输入关键词，例如：开心、无语、生气..." />
-            <button onclick="searchKeyword()">搜索</button>
+            <button onclick="searchKeyword()">模糊搜索</button>
             <button onclick="exactSearch()">精确搜索</button>
+            <button onclick="multiKeywordSearch()">多关键词查询</button>
         </div>
         <div id="queryResults" class="results"></div>
     </div>
@@ -145,11 +146,12 @@
 
         // 初始化
         let replacer = null;
+        let manager = null;
 
         async function init() {
             try {
                 // 创建数据管理器
-                const manager = new KaomojiDataManager();
+                manager = new KaomojiDataManager();
 
                 // 从文件加载数据
                 const response = await fetch('../data/kaomojis.template.json');
@@ -254,6 +256,38 @@
             displayQueryResults(results, '精确搜索');
         }
 
+        // 多关键词查询（使用 manager.findByKeyword）
+        function multiKeywordSearch() {
+            if (!manager) {
+                alert('系统未初始化');
+                return;
+            }
+
+            const query = document.getElementById('queryInput').value.trim();
+            if (!query) {
+                alert('请输入关键词（用逗号或空格分隔）');
+                return;
+            }
+
+            // 将输入按逗号或空格分割成多个关键词
+            const keywords = query.split(/[,，\s]+/).filter(k => k.length > 0);
+
+            // 使用 manager.findByKeyword 进行 AND 查询（必须同时包含所有关键词）
+            const found = manager.findByKeyword(keywords);
+
+            // 转换为与其他搜索结果一致的格式
+            // 使用 Set 优化性能（O(1) 查找 vs O(n) includes）
+            const keywordSet = new Set(keywords);
+            const results = found.map(item => ({
+                kaomoji: item.kaomoji,
+                score: 1.0,
+                matchedKeywords: item.keywords.filter(k => keywordSet.has(k)),
+                category: item.category
+            }));
+
+            displayQueryResults(results, `多关键词查询(AND) - ${keywords.join(' + ')}`);
+        }
+
         // 显示查询结果
         function displayQueryResults(results, searchType) {
             const container = document.getElementById('queryResults');
@@ -312,6 +346,7 @@
         window.loadExample3 = loadExample3;
         window.searchKeyword = searchKeyword;
         window.exactSearch = exactSearch;
+        window.multiKeywordSearch = multiKeywordSearch;
     </script>
 </body>
 </html>

@@ -115,8 +115,11 @@ const cachedData = await KaomojiReplacer.getKaomojis();
 <span class="code-comment">// 获取所有颜文字</span>
 const allKaomojis = manager.getAllKaomojis();
 
-<span class="code-comment">// 按关键词查找</span>
+<span class="code-comment">// 按单个关键词查找</span>
 const found = manager.findByKeyword('开心');
+
+<span class="code-comment">// 按多个关键词查找（AND 逻辑：必须同时包含所有关键词）</span>
+const foundMultiple = manager.findByKeyword(['开心', '高兴']);
 
 <span class="code-comment">// 按分类筛选</span>
 const filtered = manager.filterByCategory('表情');</code></pre>
@@ -268,8 +271,11 @@ async function main() {
             // 获取所有数据
             const allKaomojis = manager.getAllKaomojis();
 
-            // 按关键词查找
+            // 按单个关键词查找
             const foundByKeyword = manager.findByKeyword('开心');
+
+            // 按多个关键词查找（AND 逻辑：必须同时包含所有关键词）
+            const foundMultiple = manager.findByKeyword(['开心', '高兴']);
 
             // 获取特定颜文字的关键词
             const keywords = manager.getKeywordsByKaomoji('= =');
@@ -278,7 +284,8 @@ async function main() {
                 `✅ 读取成功！<br>` +
                 `IndexedDB 中有数据: ${cachedData ? '是' : '否'}<br>` +
                 `总颜文字数: ${allKaomojis.length}<br>` +
-                `关键词"开心"匹配到: ${foundByKeyword.length} 个<br>` +
+                `单个关键词"开心"匹配到: ${foundByKeyword.length} 个<br>` +
+                `多关键词['开心','高兴'](AND)匹配到: ${foundMultiple.length} 个<br>` +
                 `"= ="的关键词: ${keywords.join(', ')}`;
         }
 
