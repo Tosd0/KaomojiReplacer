@@ -566,7 +566,9 @@
             // 注意：现在即使没有整词匹配，单字匹配也可能有分数，所以只检查 score > threshold
             return results
                 .filter(r => r.score > threshold)
-                .sort((a, b) => b.score - a.score)
+                .map(item => ({ item, random: Math.random() }))
+                .sort((a, b) => (b.item.score - a.item.score) || (a.random - b.random))
+                .map(({ item }) => item)
                 .slice(0, topK);
         }
 
@@ -631,7 +633,10 @@
                 }
             });
 
-            return results.sort((a, b) => b.score - a.score);
+            return results
+                .map(item => ({ item, random: Math.random() }))
+                .sort((a, b) => (b.item.score - a.item.score) || (a.random - b.random))
+                .map(({ item }) => item);
         }
     }
 
