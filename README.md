@@ -48,7 +48,24 @@ git clone https://github.com/Tosd0/KaomojiReplacer.git
 - 匹配多个关键词时，如果权重都 >1，取最大值；都 <1，取最小值；既有 >1 又有 <1，则相乘
 - 最终得分 = 匹配分数 × 关键词权重 × 颜文字权重（`weight` 字段）
 
+### 标记格式
+
+在文本中使用 `[kaomoji:关键词1,关键词2,...]` 格式标记需要替换的位置：
+
+```
+今天很[kaomoji:开心,高兴]  →  今天很 ヽ(´▽`)/
+真是[kaomoji:无语]         →  真是 = =
+```
+
 ### 使用方式
+
+#### Prompt 构建
+
+为了让AI了解颜文字格式，你可以使用下面的 Prompt（或自行优化）指导 AI。Prompt 仅供参考。
+
+```
+**颜文字格式**: \`[kaomoji:关键词1,关键词2]\` (根据关键词智能匹配颜文字，如：[kaomoji:开心,高兴] → ヽ(´▽\`)/ 或 [kaomoji:无语] → = =)\n你可以使用2-6个关键词描述你想要发送的颜文字。关键词如：“双人”“卖萌”“无语”“大笑”“猫/狗/鸟/...”“跑”等。
+```
 
 #### 方式 0: UMD + CDN + IndexedDB（推荐，浏览器环境最简单）
 
@@ -76,7 +93,7 @@ console.log(result.text); // 输出: 今天很ヽ(´▽`)/
 **特性：**
 - ✅ 只需一个 UMD 文件，无需额外依赖
 - ✅ 首次从 CDN 加载，之后从 IndexedDB 缓存读取
-- ✅ 离线可用（数据已缓存）
+- ✅ 离线可用
 - ✅ 支持 jsDelivr 和 unpkg 两种 CDN
 
 **示例文件：** [examples/umd-example.html](examples/umd-example.html)
@@ -137,7 +154,7 @@ manager.setCategory('= =', '表情');          // 设置分类
 const filtered = manager.filterByCategory('表情'); // 按分类筛选
 ```
 
-#### 方式 4: IndexedDB 存储（推荐，前端项目）
+#### 方式 4: ES Module + IndexedDB 存储（推荐，前端项目）
 
 适合前端项目，自动管理数据持久化：
 
@@ -165,15 +182,6 @@ const cachedKaomojis = await initKaomojiStorage();
 ### TypeScript 支持
 
 本库提供完整的 TypeScript 类型定义，支持类型检查和智能提示。
-
-### 标记格式
-
-在文本中使用 `[kaomoji:关键词1,关键词2,...]` 格式标记需要替换的位置：
-
-```
-今天很[kaomoji:开心,高兴]  →  今天很 ヽ(´▽`)/
-真是[kaomoji:无语]         →  真是 = =
-```
 
 ## SillyTavern 集成
 
