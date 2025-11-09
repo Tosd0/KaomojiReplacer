@@ -198,7 +198,7 @@ export class KaomojiDataManager {
     getKeywordsByKaomoji(kaomoji: string): string[];
     filterByCategory(category: string | string[]): KaomojiData[];
     getAllCategories(): string[];
-    findByKeyword(keyword: string): KaomojiData[];
+    findByKeyword(keyword: string | string[]): KaomojiData[];
     getStats(): DataStats;
 
     // 修改操作
