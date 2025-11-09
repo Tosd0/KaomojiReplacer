@@ -242,6 +242,11 @@ async function main() {
             const afterCount = manager.getAllKaomojis().length;
             const newKaomoji = manager.findByKeyword('加油')[0];
 
+            if (!newKaomoji) {
+                document.getElementById('create-output').innerHTML = '❌ 创建后未能找到新颜文字';
+                return;
+            }
+
             document.getElementById('create-output').innerHTML =
                 `✅ 添加成功！<br>` +
                 `添加前: ${beforeCount} 个<br>` +
@@ -296,6 +301,11 @@ async function main() {
             manager.setWeight(kaomoji, 1.5);
 
             const kaomojiData = manager.findByKeyword('无语')[0];
+
+            if (!kaomojiData) {
+                document.getElementById('update-output').innerHTML = '❌ 未能找到颜文字数据';
+                return;
+            }
 
             document.getElementById('update-output').innerHTML =
                 `✅ 更新成功！<br>` +
