@@ -35,18 +35,18 @@ jobs:
         run: npm ci --ignore-scripts
 
       - name: Build UMD bundles
-        run: npm run build
+        run: npm run build -w kaomoji-replacer
 
       - name: List dist files
-        run: ls -lh dist/
+        run: ls -lh packages/kaomoji-replacer/dist/
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: umd-bundles
           path: |
-            dist/*.js
-            dist/*.js.map
+            packages/kaomoji-replacer/dist/*.js
+            packages/kaomoji-replacer/dist/*.js.map
           retention-days: 30
 
       - name: Commit and push dist files (only on main/master)
@@ -54,7 +54,7 @@ jobs:
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git add dist/
+          git add packages/kaomoji-replacer/dist/
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else
